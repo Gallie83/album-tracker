@@ -6,16 +6,16 @@ interface Album {
   id: string,
   title: string,
   artistCredit: ArtistCredit[],
-  date: string,
+  date: string
 }
 
 interface ArtistCredit {
   name: string,
-    id: string,
+    id: string
 }
 
 interface SearchResults {
-  results: Album[];
+  results: Album[]
 } 
 
 
@@ -51,8 +51,8 @@ function App() {
 
   return (
     <>
-    <h1>Album Search</h1>
-    
+    <h1 className="text-pink-800">Album Search</h1>
+
     {/* Search input for users to search for albums */}
     <input 
       type="text"
@@ -66,7 +66,8 @@ function App() {
       searchResults.results.map((album) => (
         <div key={album.id}>
           <h2>{album.title}</h2>
-          <p>Artist: {album.artistCredit[0]?.name || 'No artist information available'}</p>
+          <img src={`https://coverartarchive.org/release/${album.id}/front`} alt="Album art" />
+          <p className='font-bold'>Artist: {album.artistCredit[0]?.name || 'No artist information available'}</p>
           <p>Release Date: {album.date}</p>
         </div>
       ))
