@@ -51,7 +51,7 @@ function App() {
 
   return (
     <>
-    <h1 className="text-pink-800">Album Search</h1>
+    <h1>Album Search</h1>
 
     {/* Search input for users to search for albums */}
     <input 
