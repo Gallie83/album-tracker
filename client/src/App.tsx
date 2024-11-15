@@ -11,7 +11,8 @@ interface Album {
   title: string,
   // artistCredit: ArtistCredit[],
   date: string,
-  artist: string
+  artist: string,
+  imageUrl: string 
 }
 
 // interface ArtistCredit {
@@ -30,7 +31,7 @@ function App() {
   const [searchValue, setSearchValue] = useState<string>('');
   const [searchResults, setSearchResults] = useState<SearchResults>();
   // Changes search type from Album/Artist/genre etc. release is default which searches for albums
-  const [searchType, setSearchType] = useState<string>('release');
+  // const [searchType, setSearchType] = useState<string>('release');
 
   // Tracks searchValue input
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,29 +40,28 @@ function App() {
   
   const handleSearch = async () => {
     try {
-      console.log(import.meta.env.VITE_APP_API_KEY)
       // Searches for albums based on user input for searchValue
-      // const response = await fetch(`https://musicbrainz.org/ws/2/${searchType}/?query=${searchType}:${encodeURIComponent(searchValue)}&fmt=json`);
       const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=album.search&album=${searchValue}&api_key=${apiKey}&format=json`)
       const data = await response.json()
       console.log(data.results.albummatches.album)
-      // Handles Album Searching
-      if(searchType == 'release') {
         // Maps results to searchResults state to match SearchResults interface
         setSearchResults({
-        results: data.results.albummatches.album.map((release: { [x: string]: string; id: string; title: string; date: string; }) => ({
-          id: release.id,
-          title: release.title,
-          date: release.date,
-          // artistCredit: release['artist-credit'], 
-          artist: release.artist, 
-        }))
-      });
-    } else if(searchType == 'artist') {
-      console.log('Artist')
-      // setSearchResults
-    }
-      console.log(searchResults?.results)
+          results: data.results.albummatches.album.map((release: {
+            id: string;
+            name: string;
+            date: string;
+            artist: string;
+            image: { "#text": string; size: string }[];
+          }) => ({
+            id: release.id,
+            title: release.name,
+            date: release.date,
+            artist: release.artist,
+            imageUrl: release.image?.find(img => img.size === "extralarge")?.["#text"] || ""
+          }))
+        });
+        
+      // console.log(a)
     } catch(error) {
       console.log('Error fetching data:', error);
     }
@@ -110,10 +110,10 @@ function App() {
     {searchResults?.results ? (
       searchResults.results.map((album) => (
         <div className='bg-slate-500 p-10 m-5 rounded-lg' key={album.id}>
-          <img className='size-60' src={`https://coverartarchive.org/release/${album.id}/front`} alt="Album art" />
+          <img className='size-72' src={album.imageUrl} alt="Album art" />
           <h2 className='font-bold'>{album.title}</h2>
+          <p>Title: {album.title}</p>
           <p>Artist: {album.artist || 'No artist information available'}</p>
-          <p>Release Date: {album.date}</p>
         </div>
       ))
     ) : (
