@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './App.css'
 
-const apiKey = process.env.API_URL;
+const apiKey = import.meta.env.VITE_APP_API_KEY;
 
 
 
@@ -39,7 +39,7 @@ function App() {
   
   const handleSearch = async () => {
     try {
-      console.log(apiKey)
+      console.log(import.meta.env.VITE_APP_API_KEY)
       // Searches for albums based on user input for searchValue
       // const response = await fetch(`https://musicbrainz.org/ws/2/${searchType}/?query=${searchType}:${encodeURIComponent(searchValue)}&fmt=json`);
       const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=album.search&album=${searchValue}&api_key=${apiKey}&format=json`)
@@ -80,7 +80,7 @@ function App() {
       className='text-black m-2 p-2'
     />
 
-    <button className="group relative cursor-pointer">
+    {/* <button className="group relative cursor-pointer">
         <div className="bg-white">
             <a className="menu-hover text-black">
                 Artist/Album
@@ -99,7 +99,7 @@ function App() {
             </a>
 
         </div>
-    </button>
+    </button> */}
     
 
     <button className='m-3 p-1 border-2 border-white-600' onClick={handleSearch}>Search</button>
