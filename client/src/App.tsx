@@ -1,18 +1,23 @@
 import { useState } from 'react'
 import './App.css'
 
+const apiKey = process.env.API_URL;
+
+
+
 // Interfaces
 interface Album {
   id: string,
   title: string,
-  artistCredit: ArtistCredit[],
-  date: string
+  // artistCredit: ArtistCredit[],
+  date: string,
+  artist: string
 }
 
-interface ArtistCredit {
-  name: string,
-    id: string
-}
+// interface ArtistCredit {
+//   name: string,
+//     id: string
+// }
 
 interface SearchResults {
   results: Album[]
@@ -34,20 +39,28 @@ function App() {
   
   const handleSearch = async () => {
     try {
+      console.log(apiKey)
       // Searches for albums based on user input for searchValue
-      const response = await fetch(`https://musicbrainz.org/ws/2/${searchType}/?query=${searchType}:${encodeURIComponent(searchValue)}&fmt=json`);
-      console.log(searchType)
+      // const response = await fetch(`https://musicbrainz.org/ws/2/${searchType}/?query=${searchType}:${encodeURIComponent(searchValue)}&fmt=json`);
+      const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=album.search&album=${searchValue}&api_key=${apiKey}&format=json`)
       const data = await response.json()
-      console.log(data)
-      // Maps results to searchResults state to match SearchResults interface
-      setSearchResults({
-        results: data.releases.map((release: { [x: string]: string; id: string; title: string; date: string; }) => ({
+      console.log(data.results.albummatches.album)
+      // Handles Album Searching
+      if(searchType == 'release') {
+        // Maps results to searchResults state to match SearchResults interface
+        setSearchResults({
+        results: data.results.albummatches.album.map((release: { [x: string]: string; id: string; title: string; date: string; }) => ({
           id: release.id,
           title: release.title,
           date: release.date,
-          artistCredit: release['artist-credit'], 
+          // artistCredit: release['artist-credit'], 
+          artist: release.artist, 
         }))
       });
+    } else if(searchType == 'artist') {
+      console.log('Artist')
+      // setSearchResults
+    }
       console.log(searchResults?.results)
     } catch(error) {
       console.log('Error fetching data:', error);
@@ -99,7 +112,7 @@ function App() {
         <div className='bg-slate-500 p-10 m-5 rounded-lg' key={album.id}>
           <img className='size-60' src={`https://coverartarchive.org/release/${album.id}/front`} alt="Album art" />
           <h2 className='font-bold'>{album.title}</h2>
-          <p>Artist: {album.artistCredit[0]?.name || 'No artist information available'}</p>
+          <p>Artist: {album.artist || 'No artist information available'}</p>
           <p>Release Date: {album.date}</p>
         </div>
       ))
