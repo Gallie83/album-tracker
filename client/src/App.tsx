@@ -30,8 +30,6 @@ function App() {
   
   const [searchValue, setSearchValue] = useState<string>('');
   const [searchResults, setSearchResults] = useState<SearchResults>();
-  // Changes search type from Album/Artist/genre etc. release is default which searches for albums
-  // const [searchType, setSearchType] = useState<string>('release');
 
   // Tracks searchValue input
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,10 +58,18 @@ function App() {
             imageUrl: release.image?.find(img => img.size === "extralarge")?.["#text"] || ""
           }))
         });
-        
-      // console.log(a)
     } catch(error) {
       console.log('Error fetching data:', error);
+    }
+  }
+
+  const albumInfo = async (artist: string, album: string) => {
+    try {
+      const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=album.getInfo&api_key=${apiKey}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`);
+      const data = await response.json();
+      console.log(data)
+    } catch(error) {
+      console.error(error)
     }
   }
 
@@ -109,11 +115,10 @@ function App() {
 
     {searchResults?.results ? (
       searchResults.results.map((album) => (
-        <div className='bg-slate-500 p-10 m-5 rounded-lg' key={album.id}>
+        <div onClick={() => {albumInfo(album.artist, album.title)}} className='bg-slate-500 p-10 m-5 rounded-lg' key={album.id}>
           <img className='size-72' src={album.imageUrl} alt="Album art" />
           <h2 className='font-bold'>{album.title}</h2>
-          <p>Title: {album.title}</p>
-          <p>Artist: {album.artist || 'No artist information available'}</p>
+          <p>Artist: {album.artist}</p>
         </div>
       ))
     ) : (
