@@ -11,14 +11,13 @@ const router = createBrowserRouter([
     element: <App />,
   },
   {
-    path: '/album-info',
+    path: '/album-info/:artistName/:albumName/:albumId',
     element: <AlbumInfo />
   }
 ]);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {/* <App /> */}
     <RouterProvider router={router} />
   </StrictMode>,
 )

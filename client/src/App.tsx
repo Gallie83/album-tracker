@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import './App.css'
+import { Link } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
 const apiKey = import.meta.env.VITE_APP_API_KEY;
 
@@ -9,16 +11,9 @@ const apiKey = import.meta.env.VITE_APP_API_KEY;
 interface Album {
   id: string,
   title: string,
-  // artistCredit: ArtistCredit[],
-  date: string,
   artist: string,
   imageUrl: string 
 }
-
-// interface ArtistCredit {
-//   name: string,
-//     id: string
-// }
 
 interface SearchResults {
   results: Album[]
@@ -45,31 +40,20 @@ function App() {
         // Maps results to searchResults state to match SearchResults interface
         setSearchResults({
           results: data.results.albummatches.album.map((release: {
-            id: string;
+            id: string,
             name: string;
             date: string;
             artist: string;
             image: { "#text": string; size: string }[];
           }) => ({
-            id: release.id,
+            id: uuidv4(),
             title: release.name,
-            date: release.date,
             artist: release.artist,
             imageUrl: release.image?.find(img => img.size === "extralarge")?.["#text"] || ""
           }))
         });
     } catch(error) {
       console.log('Error fetching data:', error);
-    }
-  }
-
-  const albumInfo = async (artist: string, album: string) => {
-    try {
-      const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=album.getInfo&api_key=${apiKey}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`);
-      const data = await response.json();
-      console.log(data)
-    } catch(error) {
-      console.error(error)
     }
   }
 
@@ -115,11 +99,12 @@ function App() {
 
     {searchResults?.results ? (
       searchResults.results.map((album) => (
-        <div onClick={() => {albumInfo(album.artist, album.title)}} className='bg-slate-500 p-10 m-5 rounded-lg' key={album.id}>
+        <Link to={`/album-info/${album.artist}/${album.title}/${album.id}`} className='bg-slate-500 p-10 m-5 rounded-lg' key={album.id}>
           <img className='size-72' src={album.imageUrl} alt="Album art" />
           <h2 className='font-bold'>{album.title}</h2>
           <p>Artist: {album.artist}</p>
-        </div>
+          <p>Key: {album.id}</p>
+        </Link>
       ))
     ) : (
       <p>No Albums Found</p>
