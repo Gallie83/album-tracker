@@ -7,8 +7,11 @@ interface AlbumInfo {
     id: string,
     title: string,
     artist: string,
-    imageUrl: string 
-
+    imageUrl: string,
+    trackList: {
+        name: string,
+        // rank: number,
+    }[], 
 }
 
 function AlbumInfo() {
@@ -29,6 +32,9 @@ function AlbumInfo() {
                 imageUrl: data.album.image?.find(
                     (img: { "#text": string; size: string }) => img.size === "extralarge"
                   )?.["#text"] || "",
+                trackList: data.album.tracks.track.map((track: {name: string}) => ({
+                    name: track.name
+                })) || []
             }
             setAlbum(fetchedAlbum);
         }
@@ -52,6 +58,10 @@ function AlbumInfo() {
                 <div className="flex flex-col justify-between p-4 leading-normal">
                     <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{album.title}</h5>
                     <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">{album.artist}</p>
+                    <hr />
+                    {album.trackList.map((track) => (
+                        <p className="text-black">{track.name}</p>
+                    ))}
                 </div>
             </div>
             ) : ( <p>ERROR</p> )}
