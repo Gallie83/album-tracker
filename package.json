@@ -1,10 +1,10 @@
 {
   "name": "album-tracker",
   "version": "1.0.0",
-"scripts": {
-  "dev": "nodemon -w src/server -x tsx server/src/server.ts",
-  "start": "cross-env NODE_ENV=production tsx server/src/server.ts"
-},
+  "scripts": {
+    "dev": "nodemon -w src/server -x tsx server/src/server.ts",
+    "start": "cross-env NODE_ENV=production tsx server/src/server.ts"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
