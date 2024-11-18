@@ -11,6 +11,7 @@ interface AlbumInfo {
     trackList: {
         name: string,
     }[], 
+    description: string
 }
 
 function AlbumInfo() {
@@ -36,7 +37,8 @@ function AlbumInfo() {
                 trackList: data.album.tracks.track.map((track: {name: string, rank:number}) => ({
                     name: track.name,
                     rank: track.rank,
-                })) || []
+                })) || [],
+                description: data.album.wiki.content,
             }
             setAlbum(fetchedAlbum);
         }
@@ -55,13 +57,14 @@ function AlbumInfo() {
         <>
         {album ? (
           // Outer div
-          <div className="flex items-center justify-center h-screen overflow-hidden">
-            <div key={album.id} className="flex w-11/12 items-center bg-pink-300 border border-gray-200 rounded-lg md:flex-row p-5">
-              <img className="w-10/12 p-5 rounded-t-lg md:rounded-none md:rounded-s-lg" src={album.imageUrl} alt="Album Art"></img>
-              <div className="flex flex-col justify-between h-full w-full bg-brown-600 px-16 leading-normal">
-                <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{album.title}</h5>
+          <div className="flex items-center justify-center h-screen">
+            <div key={album.id} className="flex w-11/12 items-stretch bg-pink-300 border border-gray-200 rounded-lg md:flex-row p-5">
+              <img className="w-1/2 rounded-l-lg p-6 object-cover md:rounded-none md:rounded-s-lg" src={album.imageUrl} alt="Album Art"></img>
+              <div className="w-1/2 flex flex-col justify-between p-6 px-16 leading-normal">
+              {/* Title, Artist div */}
+              <div>
+                <h4 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{album.title}</h4>
                 <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">{album.artist}</p>
-
               {/* Track List Accordion */}
                 <div className="w-full">
                     <input
@@ -88,6 +91,13 @@ function AlbumInfo() {
                                 ))}
                     </div>
                 </div>
+              </div>
+
+
+              <div className="mt-4 border-t pt-4 overflow-y-auto max-h-96 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                {album.description}
+              </div>
+
               </div>
             </div>
           </div>
