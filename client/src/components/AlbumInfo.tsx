@@ -59,38 +59,42 @@ function AlbumInfo() {
           // Outer div
           <div className="flex items-center justify-center h-screen">
             <div key={album.id} className="flex w-11/12 items-stretch bg-pink-300 border border-gray-200 rounded-lg md:flex-row p-5">
-              <img className="w-1/2 rounded-l-lg p-6 object-cover md:rounded-none md:rounded-s-lg" src={album.imageUrl} alt="Album Art"></img>
-              <div className="w-1/2 flex flex-col justify-between p-6 px-16 leading-normal">
-              {/* Title, Artist div */}
+              {/* Left Section with Image and Track List */}
+              <div className="flex flex-col w-2/5 p-2 bg-slate-600">
+                <img
+                  className={`object-cover transition-all duration-500 ${
+                    open ? "h-48" : "h-auto"
+                  }`}
+                  src={album.imageUrl}
+                  alt="Album Art"
+                />
+                {/* Track List Accordion */}
+                <div className="w-full mt-4">
+                  <label
+                    htmlFor="trackListToggle"
+                    className="w-full flex justify-center items-center bg-blue-100 hover:bg-blue-500 transition-colors duration-300 ease-in-out cursor-pointer"
+                    onClick={() => setOpen(!open)}
+                  >
+                    Track List
+                  </label>
+                  <div
+                    className={`overflow-hidden transition-all duration-500 ${
+                      open ? "h-48 overflow-scroll" : "h-0"
+                    } bg-slate-300`}
+                  >
+                    {album.trackList.map((track, index) => (
+                      <p key={index} className="text-black px-4 py-1">
+                        {index + 1}. {track.name}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="w-3/5 bg-green-300 flex flex-col justify-between p-6 px-16 leading-normal">
+              {/* Right Sectopn with Summary */}
               <div>
                 <h4 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{album.title}</h4>
                 <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">{album.artist}</p>
-              {/* Track List Accordion */}
-                <div className="w-full">
-                    <input
-                      id="expandCollapse"
-                      checked={open}
-                      type="checkbox"
-                      className="peer sr-only"
-                      />
-                    <label
-                      htmlFor="expandCollapse"
-                      className="
-                      w-full flex justify-center items-center bg-blue-100
-                      hover:bg-blue-500
-                      transition-colors duration-1000 ease-in-out"
-                      onClick={() => setOpen(!open)}
-                      >
-                      Track List
-                    </label>
-                    <div
-                      className=
-                          "overflow-hidden h-0 bg-slate-300 peer-checked:h-[200px] peer-checked:overflow-scroll transition-[height] duration-1000 ease-in-out">
-                                {album.trackList.map((track, index) => (
-                                    <p key={index} className="text-black">{index+1}. {track.name}</p>
-                                ))}
-                    </div>
-                </div>
               </div>
 
 
@@ -100,7 +104,8 @@ function AlbumInfo() {
 
               </div>
             </div>
-          </div>
+            </div>
+        
    ) : ( <p>ERROR</p> )}
         </>
     )
