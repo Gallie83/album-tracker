@@ -60,7 +60,7 @@ function AlbumInfo() {
           <div className="flex items-center justify-center h-screen">
             <div key={album.id} className="flex w-11/12 items-stretch bg-pink-300 border border-gray-200 rounded-lg md:flex-row p-5">
               {/* Left Section with Image and Track List */}
-              <div className="flex flex-col w-2/5 p-2 bg-slate-600 ">
+              <div className="flex flex-col w-2/5 p-2 bg-slate-600">
                 <img
                   className={`object-contain transition duration-700 ease-in-out ${
                     open ? "max-h-48" : "max-h-auto"
@@ -69,27 +69,33 @@ function AlbumInfo() {
                   alt="Album Art"
                 />
                 {/* Track List Accordion */}
+
+                {/* Accordion open button */}
                 <div className="w-full mt-4 relative">
+                {/* Wrapper for both label and menu */}
+                <div
+                  className={`transition-all duration-700 ease-in-out relative`}
+                  style={{
+                    // Move label up when open
+                    transform: open ? "translateY(-3rem)" : "translateY(0)", 
+                  }}
+                >
+                  {/* Track List Button */}
                   <label
                     htmlFor="trackListToggle"
-                    className={`flex justify-center items-center bg-blue-500 hover:bg-blue-100 hover:text-black transition-transform duration-700 ease-in-out cursor-pointer`}
-                    style={{
-                      transform: open ? "translateY(16rem)" : "translateY(0)",
-                      position: "absolute",
-                      width: "100%",
-                      zIndex: 10, // Ensure button stays above menu
-                    }}
+                    className={`flex justify-center items-center bg-blue-500 hover:bg-blue-100 hover:text-black transition-all duration-700 ease-in-out cursor-pointer`}
                     onClick={() => setOpen(!open)}
                   >
                     Track List
                   </label>
+
+                  {/* Accordion Menu */}
                   <div
-                    className={`overflow-hidden bg-slate-300 transition-all duration-1000 ease-in-out`}
+                    className={`overflow-hidden bg-slate-300 transition-all duration-700 ease-in-out`}
                     style={{
-                      transform: open ? "scaleY(1)" : "scaleY(0)",
-                      transformOrigin: "bottom",
-                      height: open ? "16rem" : "0",
-                      transition: "transform 1s ease-in-out, height 1s ease-in-out",
+                      maxHeight: open ? "" : "0", // Menu height goes from 0 to auto
+                      transform: open ? "scaleY(1)" : "scaleY(0)", // Expand menu from top to bottom
+                      transformOrigin: "top", // Menu expands from top
                     }}
                   >
                     {album.trackList.map((track, index) => (
@@ -100,8 +106,11 @@ function AlbumInfo() {
                   </div>
                 </div>
               </div>
-              <div className="w-3/5 bg-green-300 flex flex-col justify-between p-6 px-16 leading-normal">
+
+              </div>
+              
               {/* Right Sectopn with Summary */}
+              <div className="w-3/5 bg-green-300 flex flex-col justify-between p-6 px-16 leading-normal">
               <div>
                 <h4 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{album.title}</h4>
                 <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">{album.artist}</p>
