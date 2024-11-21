@@ -60,27 +60,37 @@ function AlbumInfo() {
           <div className="flex items-center justify-center h-screen">
             <div key={album.id} className="flex w-11/12 items-stretch bg-pink-300 border border-gray-200 rounded-lg md:flex-row p-5">
               {/* Left Section with Image and Track List */}
-              <div className="flex flex-col w-2/5 p-2 bg-slate-600">
+              <div className="flex flex-col w-2/5 p-2 bg-slate-600 ">
                 <img
-                  className={`object-cover transition-all duration-500 ${
-                    open ? "h-48" : "h-auto"
+                  className={`object-contain transition duration-700 ease-in-out ${
+                    open ? "max-h-48" : "max-h-auto"
                   }`}
                   src={album.imageUrl}
                   alt="Album Art"
                 />
                 {/* Track List Accordion */}
-                <div className="w-full mt-4">
+                <div className="w-full mt-4 relative">
                   <label
                     htmlFor="trackListToggle"
-                    className="w-full flex justify-center items-center bg-blue-100 hover:bg-blue-500 transition-colors duration-300 ease-in-out cursor-pointer"
+                    className={`flex justify-center items-center bg-blue-500 hover:bg-blue-100 hover:text-black transition-transform duration-700 ease-in-out cursor-pointer`}
+                    style={{
+                      transform: open ? "translateY(16rem)" : "translateY(0)",
+                      position: "absolute",
+                      width: "100%",
+                      zIndex: 10, // Ensure button stays above menu
+                    }}
                     onClick={() => setOpen(!open)}
                   >
                     Track List
                   </label>
                   <div
-                    className={`overflow-hidden transition-all duration-500 ${
-                      open ? "h-48 overflow-scroll" : "h-0"
-                    } bg-slate-300`}
+                    className={`overflow-hidden bg-slate-300 transition-all duration-1000 ease-in-out`}
+                    style={{
+                      transform: open ? "scaleY(1)" : "scaleY(0)",
+                      transformOrigin: "bottom",
+                      height: open ? "16rem" : "0",
+                      transition: "transform 1s ease-in-out, height 1s ease-in-out",
+                    }}
                   >
                     {album.trackList.map((track, index) => (
                       <p key={index} className="text-black px-4 py-1">
