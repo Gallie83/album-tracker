@@ -26,6 +26,7 @@ function App() {
   const [searchValue, setSearchValue] = useState<string>('');
   const [searchResults, setSearchResults] = useState<SearchResults>();
   const [topAlbums, setTopAlbums] = useState<SearchResults>({ results: []});
+  const [tags, setTags] = useState<string[]>([])
 
   // Tracks searchValue input
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,23 +59,33 @@ function App() {
     }
   }
 
+  const fetchTags = async () => {
+    const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=tag.getTopTags&api_key=${apiKey}&format=json`);
+    const data = await response.json()   
+    console.log("RES", data.toptags.tag)
+    const names = data.toptags.tag.map((tag: {name: string}) => tag.name);
+    setTags(names)
+    console.log("TAGS:", tags)
+  }
+
+  useEffect(() => {
   const fetchTopAlbums = async () => {
+    fetchTags()
     try {
       // Returns top charting albums 
-      const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=chart.gettopartists&api_key=${apiKey}&format=json`)
+      const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=tag.gettopalbums&tag=disco&api_key=${apiKey}&format=json`)
       const data = await response.json()
-      console.log("TOP", data)
+      console.log("TOP", data.albums.album)
       setTopAlbums({
-        results: data.artists.artist.map((release: {
-        mbid: string,
+        results: data.albums.album.map((release: {
         name: string;
         date: string;
-        artist: string;
+        artist: {name: string};
         image: { "#text": string; size: string }[];
       }) => ({
         id: uuidv4(),
         title: release.name,
-        artist: release.artist,
+        artist: release.artist.name,
         imageUrl: release.image?.find(img => img.size === "extralarge")?.["#text"] || ""
         }))
       });
@@ -83,7 +94,6 @@ function App() {
     }
   }
   
-useEffect(() => {
   fetchTopAlbums()
 }, [])
 
@@ -100,49 +110,28 @@ useEffect(() => {
       className='text-black m-2 p-2'
     />
 
-    {/* <button className="group relative cursor-pointer">
-        <div className="bg-white">
-            <a className="menu-hover text-black">
-                Artist/Album
-            </a>
-        </div>
-
-        <div
-            className="invisible absolute z-50 flex w-full flex-col bg-gray-100 py-1 px-4 text-gray-800 group-hover:visible">
-
-            <a onClick={() => setSearchType('artist')} className="my-2 block border-b border-gray-100 py-1 font-semibold text-gray-500 hover:text-black md:mx-2">
-              Artist  
-            </a>
-
-            <a onClick={() => setSearchType('release')} className="my-2 block border-b border-gray-100 py-1 font-semibold text-gray-500 hover:text-black">
-              Album 
-            </a>
-
-        </div>
-    </button> */}
-    
 
     <button className='m-3 p-1 border-2 border-white-600' onClick={handleSearch}>Search</button>
+
+    {tags}
 
     {/* Check if searchResults exists and then map through releases */}
     <div className='grid grid-cols-4'>
 
     {searchResults?.results ? (
       searchResults.results.map((album) => (
-        <Link to={`/album-info/${album.artist}/${album.title}/${album.id}`} className='bg-slate-500 p-10 m-5 rounded-lg' key={album.id}>
+        <Link to={`/album-info/${album.artist}/${album.title}`} className='bg-slate-500 p-10 m-5 rounded-lg' key={album.id}>
           <img className='size-72' src={album.imageUrl} alt="Album art" />
           <h2 className='font-bold'>{album.title}</h2>
           <p>Artist: {album.artist}</p>
-          <p>Key: {album.id}</p>
         </Link>
       ))
     ) : (
       topAlbums.results.map((album) => (
-        <Link to={`/album-info/${album.artist}/${album.title}/${album.id}`} className='bg-slate-500 p-10 m-5 rounded-lg' key={album.id}>
+        <Link to={`/album-info/${album.artist}/${album.title}`} className='bg-slate-500 p-10 m-5 rounded-lg' key={album.id}>
           <img className='size-72' src={album.imageUrl} alt="Album art" />
           <h2 className='font-bold'>{album.title}</h2>
           <p>Artist: {album.artist}</p>
-          <p>Key: {album.id}</p>
         </Link>
       ))
     )}

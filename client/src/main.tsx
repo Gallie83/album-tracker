@@ -12,7 +12,7 @@ const router = createBrowserRouter([
     element: <App />,
   },
   {
-    path: '/album-info/:artistName/:albumName/:albumId',
+    path: '/album-info/:artistName/:albumName',
     element: <AlbumInfo />
   },
   {

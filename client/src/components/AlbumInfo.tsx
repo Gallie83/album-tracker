@@ -11,7 +11,7 @@ interface AlbumInfo {
     trackList: {
         name: string,
     }[], 
-    description?: string,
+    description: string,
     url: string 
 }
 
@@ -28,23 +28,30 @@ function AlbumInfo() {
         const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=album.getInfo&api_key=${apiKey}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`);
         const data = await response.json()
         console.log(data)
-        if(data.album) {
-            const fetchedAlbum: AlbumInfo = {
-                id : data.album.mbid,
-                title: album,
-                artist: artist,
-                imageUrl: data.album.image?.find(
-                    (img: { "#text": string; size: string }) => img.size === "extralarge"
-                  )?.["#text"] || "",
-                trackList: data.album.tracks.track.map((track: {name: string, rank:number}) => ({
-                    name: track.name,
-                    rank: track.rank,
-                })) || [],
-                description: data.album.wiki?.content || "No description available.",
-                url: data.album.url
-            }
-            setAlbum(fetchedAlbum);
+        if (data.album) {
+          // Check if tracklist is an array/single object
+          const tracks = Array.isArray(data.album.tracks.track)
+            ? data.album.tracks.track // It's an array
+            : [data.album.tracks.track]; // Wrap single object in an array
+        
+          const fetchedAlbum: AlbumInfo = {
+            id: data.album.mbid,
+            title: album,
+            artist: artist,
+            imageUrl:
+              data.album.image?.find(
+                (img: { "#text": string; size: string }) => img.size === "extralarge"
+              )?.["#text"] || "",
+            trackList: tracks.map((track: { name: string; rank: number }) => ({
+              name: track.name,
+              rank: track.rank,
+            })),
+            description: data.album.wiki?.content || "No description available.",
+            url: data.album.url,
+          };
+          setAlbum(fetchedAlbum);
         }
+        
     } catch(error) {
         console.error(error)
     }
