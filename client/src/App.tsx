@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import { Link } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
@@ -25,6 +25,7 @@ function App() {
   
   const [searchValue, setSearchValue] = useState<string>('');
   const [searchResults, setSearchResults] = useState<SearchResults>();
+  const [topAlbums, setTopAlbums] = useState<SearchResults>({ results: []});
 
   // Tracks searchValue input
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,6 +57,35 @@ function App() {
       console.log('Error fetching data:', error);
     }
   }
+
+  const fetchTopAlbums = async () => {
+    try {
+      // Returns top charting albums 
+      const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=chart.gettopartists&api_key=${apiKey}&format=json`)
+      const data = await response.json()
+      console.log("TOP", data)
+      setTopAlbums({
+        results: data.artists.artist.map((release: {
+        mbid: string,
+        name: string;
+        date: string;
+        artist: string;
+        image: { "#text": string; size: string }[];
+      }) => ({
+        id: uuidv4(),
+        title: release.name,
+        artist: release.artist,
+        imageUrl: release.image?.find(img => img.size === "extralarge")?.["#text"] || ""
+        }))
+      });
+    } catch (error) {
+      console.log('Error fetching data:', error);
+    }
+  }
+  
+useEffect(() => {
+  fetchTopAlbums()
+}, [])
 
   return (
     <>
@@ -107,7 +137,14 @@ function App() {
         </Link>
       ))
     ) : (
-      <p>No Albums Found</p>
+      topAlbums.results.map((album) => (
+        <Link to={`/album-info/${album.artist}/${album.title}/${album.id}`} className='bg-slate-500 p-10 m-5 rounded-lg' key={album.id}>
+          <img className='size-72' src={album.imageUrl} alt="Album art" />
+          <h2 className='font-bold'>{album.title}</h2>
+          <p>Artist: {album.artist}</p>
+          <p>Key: {album.id}</p>
+        </Link>
+      ))
     )}
     </div>
 
