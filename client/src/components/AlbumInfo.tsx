@@ -11,7 +11,8 @@ interface AlbumInfo {
     trackList: {
         name: string,
     }[], 
-    description: string
+    description?: string,
+    url: string 
 }
 
 function AlbumInfo() {
@@ -26,6 +27,7 @@ function AlbumInfo() {
             try {
         const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=album.getInfo&api_key=${apiKey}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`);
         const data = await response.json()
+        console.log(data)
         if(data.album) {
             const fetchedAlbum: AlbumInfo = {
                 id : data.album.mbid,
@@ -38,11 +40,11 @@ function AlbumInfo() {
                     name: track.name,
                     rank: track.rank,
                 })) || [],
-                description: data.album.wiki.content,
+                description: data.album.wiki?.content || "No description available.",
+                url: data.album.url
             }
             setAlbum(fetchedAlbum);
         }
-        console.log(data)
     } catch(error) {
         console.error(error)
     }
