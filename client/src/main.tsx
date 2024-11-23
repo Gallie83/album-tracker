@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import './index.css'
 import App from './App.tsx'
 import AlbumInfo from './components/AlbumInfo.tsx';
+import ArtistInfo from './components/ArtistInfo.tsx';
 
 const router = createBrowserRouter([
   {
@@ -13,6 +14,10 @@ const router = createBrowserRouter([
   {
     path: '/album-info/:artistName/:albumName/:albumId',
     element: <AlbumInfo />
+  },
+  {
+    path: '/artist-info/:artistName',
+    element: <ArtistInfo />
   }
 ]);
 

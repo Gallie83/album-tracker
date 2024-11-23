@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom"
+import { useParams, Link } from "react-router-dom"
 
 const apiKey = import.meta.env.VITE_APP_API_KEY;
 
@@ -111,17 +111,20 @@ function AlbumInfo() {
 
               </div>
               
-              {/* Right Sectopn with Summary */}
+              {/* Right Section with Summary */}
               <div className="w-3/5 bg-green-300 flex flex-col justify-between p-6 px-16 leading-normal">
               <div>
                 <h4 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{album.title}</h4>
-                <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">{album.artist}</p>
+                <Link to={`/artist-info/${album.artist}`} className="mb-3 font-normal text-gray-700 dark:text-gray-400">{album.artist}</Link>
               </div>
 
-
+              {/* Album information */}
               <div className="mt-4 border-t pt-4 overflow-y-auto max-h-96 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                 {album.description}
               </div>
+
+              {/* Link to Album page on Last.fm */}
+                <a target="_blank" rel="noopener noreferrer" className="border border-black p-1 bg-stone-400" href={album.url}>More info</a>
 
               </div>
             </div>
