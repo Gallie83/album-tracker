@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react'
 import './App.css'
 import { Link } from 'react-router-dom';
@@ -62,6 +63,7 @@ function App() {
     }
   }
 
+useEffect(() => {
   // Fetches Genre tags and stores them in state
   const fetchTags = async () => {
     const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=tag.getTopTags&api_key=${apiKey}&format=json`);
@@ -71,12 +73,15 @@ function App() {
     console.log("TAGS", tags)
   }
 
+  fetchTags()
+}, [])
+
   useEffect(() => {
-  const fetchTopAlbums = async () => {
-    // Gets genre tags
-    fetchTags()
+    // Make sure tags is populated 
+    if(tags.length === 0) return
+
+    const fetchTopAlbums = async () => {
     try {
-      console.log("1")
       const albumPromises = tags.map(async (tag) => {
         const response = await fetch(
           `https://ws.audioscrobbler.com/2.0/?method=tag.gettopalbums&tag=${tag}&api_key=${apiKey}&format=json`
@@ -84,27 +89,26 @@ function App() {
         const data = await response.json();
         console.log("DATA", data)
         
-    // Check if data.albums and data.albums.album exist and are arrays
-    if (data.albums && Array.isArray(data.albums.album)) {
-      console.log("Start")
-      // Set data for the genre
-      return {
-        [tag]: data.albums.album.map((release: {
-          name: string;
-          artist: { name: string };
-          image: { "#text": string; size: string }[];
-        }) => ({
-          id: uuidv4(),
-          title: release.name,
-          artist: release.artist.name,
-          imageUrl: release.image?.find(img => img.size === "extralarge")?.["#text"] || "",
-        })),
-      };
-    } else {
-      console.error(`No albums found for tag ${tag} or incorrect structure`);
-      return { [tag]: [] };  // Return empty array if no albums are found
-    }
-  });
+        // Check if data.albums and data.albums.album exist and are arrays
+        if (data.albums && Array.isArray(data.albums.album)) {
+        // Set data for the genre
+        return {
+          [tag]: data.albums.album.map((release: {
+            name: string;
+            artist: { name: string };
+            image: { "#text": string; size: string }[];
+          }) => ({
+            id: uuidv4(),
+            title: release.name,
+            artist: release.artist.name,
+            imageUrl: release.image?.find(img => img.size === "extralarge")?.["#text"] || "",
+          })),
+        };
+      } else {
+        console.error(`No albums found for tag ${tag} or incorrect structure`);
+        return { [tag]: [] };  // Return empty array if no albums are found
+      }
+    });
   
       // Resolve all promises and merge results
       const results = await Promise.all(albumPromises);
@@ -118,7 +122,7 @@ function App() {
   }
   
   fetchTopAlbums()
-}, [])
+}, [tags])
 
   return (
     <>
@@ -146,10 +150,7 @@ function App() {
     </div>
 
     {/* Check if searchResults exists and then map through releases */}
-    <div className='grid grid-cols-4'>
-
-
-
+    {/* <div className='grid grid-cols-4'> */}
     {searchResults?.results ? (
       searchResults.results.map((album) => (
         <Link to={`/album-info/${album.artist}/${album.title}`} className='bg-slate-500 p-5 m-5 rounded-lg' key={album.id}>
@@ -159,16 +160,21 @@ function App() {
         </Link>
       ))
     ) : (
+      // Shows genres with best of albums if user has not yet searched
       Object.entries(albumsByGenre).map(([genre, albums]) => (
-        <div key={genre}>
-          <h2>{genre}</h2>
+        <div className='block bg-gray-100 p-4 my-2 rounded' key={genre}>
+          <h2>{genre.toUpperCase()}</h2>
           {albums.map(album => (
-            <p key={album.id}>{album.title}</p>
+            <Link to={`/album-info/${album.artist}/${album.title}`} className='bg-slate-500 p-5 m-5 rounded-lg' key={album.id}>
+            <img className='size-72' src={album.imageUrl} alt="Album art" />
+            <h2 className='font-bold'>{album.title}</h2>
+            <p>Artist: {album.artist}</p>
+          </Link>
           ))}
         </div>
       ))
     )}
-    </div>
+    {/* </div> */}
 
 
     </>
