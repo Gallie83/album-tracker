@@ -87,7 +87,7 @@ function App() {
     // Check if data.albums and data.albums.album exist and are arrays
     if (data.albums && Array.isArray(data.albums.album)) {
       console.log("Start")
-      // Transform data for the genre
+      // Set data for the genre
       return {
         [tag]: data.albums.album.map((release: {
           name: string;
@@ -159,15 +159,14 @@ function App() {
         </Link>
       ))
     ) : (
-      // albumsByGenre ? (
-      // albumsByGenre.results.map((album) => (
-      //   <Link to={`/album-info/${album.artist}/${album.title}`} className='bg-slate-500 p-3 m-5 rounded-lg' key={album.id}>
-      //     <img className='size-72' src={album.imageUrl} alt="Album art" />
-      //     <h2 className='font-bold'>{album.title}</h2>
-      //     <p>Artist: {album.artist}</p>
-      //   </Link>
-      // ))) : "null"
-      <p></p>
+      Object.entries(albumsByGenre).map(([genre, albums]) => (
+        <div key={genre}>
+          <h2>{genre}</h2>
+          {albums.map(album => (
+            <p key={album.id}>{album.title}</p>
+          ))}
+        </div>
+      ))
     )}
     </div>
 
