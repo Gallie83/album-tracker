@@ -191,12 +191,12 @@ useEffect(() => {
   // Display genres with best albums if no search results
   Object.entries(albumsByGenre).map(([genre, albums]) => (
   <div id="controls-carousel" className="relative w-full" data-carousel="static">
+    {/* Genre Title */}
   <h1>{genre.toUpperCase()}</h1>
     {/* Carousel wrapper */}
-    <div className="relative h-56 overflow-hidden rounded-lg md:h-96">
-         {/* Item 1 */}
-        <div className="hidden duration-700 bg-pink-300 h-10 ease-in-out" data-carousel-item>
-        <div className="flex overflow-x-auto bg-pink-300 gap-5">
+    <div className="relative h-56 overflow-x-auto rounded-lg md:h-96">
+         {/* Carousel Items */}
+        <div className="flex gap-5 bg-pink-300 ease-in-out" data-carousel-item>
         {albums.map((album) => (
           <Link
             to={`/album-info/${album.artist}/${album.title}`}
@@ -208,7 +208,6 @@ useEffect(() => {
             <p>Artist: {album.artist}</p>
           </Link>
         ))}
-      </div>
       </div>
     </div>
 
