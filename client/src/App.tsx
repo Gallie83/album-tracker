@@ -143,38 +143,51 @@ useEffect(() => {
     <div className="grid grid-cols-12">
 
     {tags.map((tag) => (
-      <div className="flex justify-center items-center m-1 font-medium py-1 px-2 rounded-full text-gray-700 bg-gray-100">
-        <div className="text-xs font-normal leading-none max-w-full">{tag}</div>
-      </div>
+      // <div className="flex justify-center items-center m-1 font-medium py-1 px-2 rounded-full text-gray-700 bg-gray-100">
+      //   <div className="text-xs font-normal leading-none max-w-full">{tag}</div>
+      // </div>
+      <p></p>
     ))}
     </div>
 
     {/* Check if searchResults exists and then map through releases */}
-    {/* <div className='grid grid-cols-4'> */}
     {searchResults?.results ? (
-      searchResults.results.map((album) => (
-        <Link to={`/album-info/${album.artist}/${album.title}`} className='bg-slate-500 p-5 m-5 rounded-lg' key={album.id}>
-          <img className='size-72' src={album.imageUrl} alt="Album art" />
-          <h2 className='font-bold'>{album.title}</h2>
-          <p>Artist: {album.artist}</p>
-        </Link>
-      ))
-    ) : (
-      // Shows genres with best of albums if user has not yet searched
-      Object.entries(albumsByGenre).map(([genre, albums]) => (
-        <div className='block bg-gray-100 p-4 my-2 rounded' key={genre}>
-          <h2>{genre.toUpperCase()}</h2>
-          {albums.map(album => (
-            <Link to={`/album-info/${album.artist}/${album.title}`} className='bg-slate-500 p-5 m-5 rounded-lg' key={album.id}>
-            <img className='size-72' src={album.imageUrl} alt="Album art" />
-            <h2 className='font-bold'>{album.title}</h2>
+  // Display search results in a grid
+  <div className="grid grid-cols-4 gap-5">
+    {searchResults.results.map((album) => (
+      <Link
+        to={`/album-info/${album.artist}/${album.title}`}
+        className="bg-slate-500 p-5 m-5 rounded-lg"
+        key={album.id}
+      >
+        <img className="size-72" src={album.imageUrl} alt="Album art" />
+        <h2 className="font-bold">{album.title}</h2>
+        <p>Artist: {album.artist}</p>
+      </Link>
+    ))}
+  </div>
+) : (
+  // Display genres with best albums if no search results
+  Object.entries(albumsByGenre).map(([genre, albums]) => (
+    <div className="block border border-white my-2 rounded" key={genre}>
+      <h2>{genre.toUpperCase()}</h2>
+      <div className="flex overflow-x-auto gap-5">
+        {albums.map((album) => (
+          <Link
+            to={`/album-info/${album.artist}/${album.title}`}
+            className="bg-slate-500 p-3 m-3 rounded-lg"
+            key={album.id}
+          >
+            <img className="w-96 h-96  object-cover" src={album.imageUrl} alt="Album art" />
+            <h2 className="font-bold">{album.title}</h2>
             <p>Artist: {album.artist}</p>
           </Link>
-          ))}
-        </div>
-      ))
-    )}
-    {/* </div> */}
+        ))}
+      </div>
+    </div>
+  ))
+)}
+
 
 
     </>
