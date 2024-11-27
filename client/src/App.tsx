@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import './App.css'
 import { Link } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
@@ -33,6 +33,9 @@ function App() {
   const [albumsByGenre, setAlbumsByGenre] = useState<AlbumsByGenre>({});
   const [tags, setTags] = useState<string[]>([])
 
+  // const carouselRef = useRef({})
+  const carouselRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
   // Tracks searchValue input
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
@@ -63,18 +66,18 @@ function App() {
     }
   }
 
-useEffect(() => {
-  // Fetches Genre tags and stores them in state
-  const fetchTags = async () => {
-    const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=tag.getTopTags&api_key=${apiKey}&format=json`);
-    const data = await response.json()   
-    const names = data.toptags.tag.map((tag: {name: string}) => tag.name);
-    setTags(names)
-    console.log("TAGS", tags)
-  }
+  useEffect(() => {
+    // Fetches Genre tags and stores them in state
+    const fetchTags = async () => {
+      const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=tag.getTopTags&api_key=${apiKey}&format=json`);
+      const data = await response.json()   
+      const names = data.toptags.tag.map((tag: {name: string}) => tag.name);
+      setTags(names)
+      console.log("TAGS", tags)
+    }
 
-  fetchTags()
-}, [])
+    fetchTags()
+  }, [])
 
   useEffect(() => {
     // Make sure tags is populated 
@@ -122,7 +125,20 @@ useEffect(() => {
   }
   
   fetchTopAlbums()
-}, [tags])
+  }, [tags])
+
+  const scrollCarousel = (genre: string, direction: "next" | "prev") => {
+    const carousel = carouselRefs.current[genre];
+
+    const scrollAmount = 300;
+    if(carousel) {
+      console.log(carousel)
+      carousel.scrollBy({
+        left: direction === 'next' ? scrollAmount : -scrollAmount,
+        behavior: "smooth",
+      })
+    }
+  }
 
   return (
     <>
@@ -166,71 +182,89 @@ useEffect(() => {
       </Link>
     ))}
   </div>
-) : (
-  // Display genres with best albums if no search results
-  // Object.entries(albumsByGenre).map(([genre, albums]) => (
-  //   <div className="block border border-white my-2 rounded" key={genre}>
-  //     <h2>{genre.toUpperCase()}</h2>
-  //     <div className="flex overflow-x-auto gap-5">
-  //       {albums.map((album) => (
-  //         <Link
-  //           to={`/album-info/${album.artist}/${album.title}`}
-  //           className="bg-slate-500 p-53 m-3 rounded-lg"
-  //           key={album.id}
-  //         >
-  //           <img className="w-48  object-cover" src={album.imageUrl} alt="Album art" />
-  //           <h2 className="font-bold">{album.title}</h2>
-  //           <p>Artist: {album.artist}</p>
-  //         </Link>
-  //       ))}
-  //     </div>
-  //   </div>
-  // ))
-
-  
-  // Display genres with best albums if no search results
-  Object.entries(albumsByGenre).map(([genre, albums]) => (
-  <div id="controls-carousel" className="relative w-full" data-carousel="static">
-    {/* Genre Title */}
-  <h1>{genre.toUpperCase()}</h1>
-    {/* Carousel wrapper */}
-    <div className="relative h-56 overflow-x-auto rounded-lg md:h-96">
-         {/* Carousel Items */}
-        <div className="flex gap-5 bg-pink-300 ease-in-out" data-carousel-item>
-        {albums.map((album) => (
-          <Link
-            to={`/album-info/${album.artist}/${album.title}`}
-            className="bg-slate-500 p-53 m-3 rounded-lg"
-            key={album.id}
-          >
-            <img className="w-48  object-cover" src={album.imageUrl} alt="Album art" />
-            <h2 className="font-bold">{album.title}</h2>
-            <p>Artist: {album.artist}</p>
-          </Link>
-        ))}
+) : (  
+    // Display genres with best albums if no search results
+    Object.entries(albumsByGenre).map(([genre, albums]) => (
+    <div id="controls-carousel" className="relative w-full" data-carousel="static">
+      {/* Genre Title */}
+    <h1>{genre.toUpperCase()}</h1>
+      {/* Carousel wrapper */}
+      <div className="relative bg-pink-300 h-56 overflow-x-auto rounded-lg md:h-96">
+          {/* Carousel Items */}
+          <div 
+            ref={(el) => carouselRefs.current[genre] = el}
+            className="flex gap-5 ease-in-out" 
+            data-carousel-item
+            style={{ scrollSnapType: "x mandatory"}}
+            >
+          {albums.map((album) => (
+            <Link
+              to={`/album-info/${album.artist}/${album.title}`}
+              className="bg-slate-500 p-3 m-3 rounded-lg"
+              key={album.id}
+            >
+              <div className='h-48 w-48'>
+              <img className="object-fill" src={album.imageUrl} alt="Album art" />
+              </div>
+              <h2 className="font-bold">{album.title}</h2>
+              <p>Artist: {album.artist}</p>
+            </Link>
+          ))}
+        </div>
       </div>
+
+
+  {/* Slider controls */}
+      <button
+        type="button"
+        className="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+        onClick={() => scrollCarousel(genre, "prev")}
+      >
+        <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 group-hover:bg-white/50">
+          <svg
+            className="w-4 h-4 text-white"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 6 10"
+          >
+            <path
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M5 1 1 5l4 4"
+            />
+          </svg>
+          <span className="sr-only">Previous</span>
+        </span>
+      </button>
+      <button
+        type="button"
+        className="absolute top-0 right-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+        onClick={() => scrollCarousel(genre, "next")}
+      >
+        <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 group-hover:bg-white/50">
+          <svg
+            className="w-4 h-4 text-white"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 6 10"
+          >
+            <path
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="m1 9 4-4-4-4"
+            />
+          </svg>
+          <span className="sr-only">Next</span>
+        </span>
+      </button>
     </div>
-
-
-    {/* Slider controls */}
-    <button type="button" className="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-prev>
-        <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
-            <svg className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 1 1 5l4 4"/>
-            </svg>
-            <span className="sr-only">Previous</span>
-        </span>
-    </button>
-    <button type="button" className="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-next>
-        <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
-            <svg className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-            </svg>
-            <span className="sr-only">Next</span>
-        </span>
-    </button>
-</div>
-  ))
+    ))
 )}
 
 
