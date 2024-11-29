@@ -130,13 +130,14 @@ function App() {
   const scrollCarousel = (genre: string, direction: "next" | "prev") => {
     const carousel = carouselRefs.current[genre];
 
-    const scrollAmount = 300;
+    const scrollAmount = 1300;
     if(carousel) {
-      console.log(carousel)
       carousel.scrollBy({
         left: direction === 'next' ? scrollAmount : -scrollAmount,
         behavior: "smooth",
       })
+    } else {
+      console.log("No carousel")
     }
   }
 
@@ -185,17 +186,24 @@ function App() {
 ) : (  
     // Display genres with best albums if no search results
     Object.entries(albumsByGenre).map(([genre, albums]) => (
-    <div id="controls-carousel" className="relative w-full" data-carousel="static">
+    <div 
+      id="controls-carousel" 
+      className="relative w-full" 
+      data-carousel="static"
+      key={genre}
+     >
       {/* Genre Title */}
     <h1>{genre.toUpperCase()}</h1>
       {/* Carousel wrapper */}
-      <div className="relative bg-pink-300 h-56 overflow-x-auto rounded-lg md:h-96">
+      <div 
+        className="relative bg-pink-300 h-56 overflow-x-auto rounded-lg md:h-96"
+          ref={(el) => (carouselRefs.current[genre] = el)}
+          style={{ scrollSnapType: "x mandatory"}}
+      >
           {/* Carousel Items */}
           <div 
-            ref={(el) => carouselRefs.current[genre] = el}
             className="flex gap-5 ease-in-out" 
             data-carousel-item
-            style={{ scrollSnapType: "x mandatory"}}
             >
           {albums.map((album) => (
             <Link
