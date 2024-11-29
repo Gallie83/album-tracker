@@ -196,7 +196,7 @@ function App() {
     <h1>{genre.toUpperCase()}</h1>
       {/* Carousel wrapper */}
       <div 
-        className="relative bg-pink-300 h-56 overflow-x-auto rounded-lg md:h-96"
+        className="relative bg-pink-300 h-56 overflow-x-auto rounded-lg md:h-96 scroll-bar"
           ref={(el) => (carouselRefs.current[genre] = el)}
           style={{ scrollSnapType: "x mandatory"}}
       >
