@@ -193,10 +193,10 @@ function App() {
       key={genre}
      >
       {/* Genre Title */}
-    <h1>{genre.toUpperCase()}</h1>
+      <h1>{genre.toUpperCase()}</h1>
       {/* Carousel wrapper */}
       <div 
-        className="relative bg-pink-300 h-56 overflow-x-auto rounded-lg md:h-96 scroll-bar"
+        className="relative bg-pink-300 overflow-x-auto rounded-lg mb-5 md:h-80 scroll-bar"
           ref={(el) => (carouselRefs.current[genre] = el)}
           style={{ scrollSnapType: "x mandatory"}}
       >
@@ -208,14 +208,16 @@ function App() {
           {albums.map((album) => (
             <Link
               to={`/album-info/${album.artist}/${album.title}`}
-              className="bg-slate-500 p-3 m-3 rounded-lg"
+              className="bg-slate-500 px-3 py-2 mx-3 my-2 rounded-lg"
               key={album.id}
             >
               <div className='h-48 w-48'>
               <img className="object-fill" src={album.imageUrl} alt="Album art" />
               </div>
-              <h2 className="font-bold">{album.title}</h2>
-              <p>Artist: {album.artist}</p>
+              <div className='mt-3'>
+              <h2 className="font-bold text-ellipsis overflow-hidden line-clamp-2">{album.title}</h2>
+              <p>{album.artist}</p>
+              </div>
             </Link>
           ))}
         </div>
