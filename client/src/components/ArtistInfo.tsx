@@ -14,7 +14,7 @@ interface ArtistInfo {
     url: string 
 }
 
-function AlbumInfo() {
+function ArtistInfo() {
     const params = useParams<{artistName:string}>();
     const [artist, setArtist] = useState<ArtistInfo>();
 
@@ -84,4 +84,4 @@ function AlbumInfo() {
     )
 }
 
-export default AlbumInfo
+export default ArtistInfo

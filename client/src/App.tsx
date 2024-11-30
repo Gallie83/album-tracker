@@ -16,20 +16,13 @@ interface Album {
   imageUrl: string 
 }
 
-interface SearchResults {
-  results: Album[]
-} 
-
 interface AlbumsByGenre {
   [genre: string]: Album[];
 }
 
-
-
 function App() {
   
   const [searchValue, setSearchValue] = useState<string>('');
-  const [searchResults, setSearchResults] = useState<SearchResults>();
   const [albumsByGenre, setAlbumsByGenre] = useState<AlbumsByGenre>({});
   const [tags, setTags] = useState<string[]>([])
 
@@ -40,31 +33,6 @@ function App() {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
   };
-  
-  const handleSearch = async () => {
-    try {
-      // Searches for albums based on user input for searchValue
-      const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=album.search&album=${searchValue}&api_key=${apiKey}&format=json`)
-      const data = await response.json()
-        // Maps results to searchResults state to match SearchResults interface
-        setSearchResults({
-          results: data.results.albummatches.album.map((release: {
-            id: string,
-            name: string;
-            date: string;
-            artist: string;
-            image: { "#text": string; size: string }[];
-          }) => ({
-            id: uuidv4(),
-            title: release.name,
-            artist: release.artist,
-            imageUrl: release.image?.find(img => img.size === "extralarge")?.["#text"] || ""
-          }))
-        });
-    } catch(error) {
-      console.log('Error fetching data:', error);
-    }
-  }
 
   useEffect(() => {
     // Fetches Genre tags and stores them in state
@@ -127,6 +95,7 @@ function App() {
   fetchTopAlbums()
   }, [tags])
 
+  // Scrolls carousel using left+right buttons 
   const scrollCarousel = (genre: string, direction: "next" | "prev") => {
     const carousel = carouselRefs.current[genre];
 
@@ -155,7 +124,7 @@ function App() {
     />
 
 
-    <button className='m-3 p-1 border-2 border-white-600' onClick={handleSearch}>Search</button>
+    <Link to={`/search/${searchValue}`} className='m-3 p-1 border-2 border-white-600'>Search</Link>
 
     <div className="grid grid-cols-12">
 
@@ -167,118 +136,97 @@ function App() {
     ))}
     </div>
 
-    {/* Check if searchResults exists and then map through releases */}
-    {searchResults?.results ? (
-  // Display search results in a grid
-  <div className="grid grid-cols-4 gap-5">
-    {searchResults.results.map((album) => (
-      <Link
-        to={`/album-info/${album.artist}/${album.title}`}
-        className="bg-slate-500 p-5 m-5 rounded-lg"
-        key={album.id}
-      >
-        <img className="size-72" src={album.imageUrl} alt="Album art" />
-        <h2 className="font-bold">{album.title}</h2>
-        <p>Artist: {album.artist}</p>
-      </Link>
-    ))}
-  </div>
-) : (  
-    // Display genres with best albums if no search results
-    Object.entries(albumsByGenre).map(([genre, albums]) => (
-    <div 
-      id="controls-carousel" 
-      className="relative w-full" 
-      data-carousel="static"
-      key={genre}
-     >
-      {/* Genre Title */}
-      <h1>{genre.toUpperCase()}</h1>
-      {/* Carousel wrapper */}
+    {/* Display genres with best albums  */}
+    {Object.entries(albumsByGenre).map(([genre, albums]) => (
       <div 
-        className="relative bg-pink-300 overflow-x-auto rounded-lg mb-5 md:h-80 scroll-bar"
-          ref={(el) => (carouselRefs.current[genre] = el)}
-          style={{ scrollSnapType: "x mandatory"}}
+        id="controls-carousel" 
+        className="relative w-full" 
+        data-carousel="static"
+        key={genre}
       >
-          {/* Carousel Items */}
-          <div 
-            className="flex gap-5 ease-in-out" 
-            data-carousel-item
-            >
-          {albums.map((album) => (
-            <Link
-              to={`/album-info/${album.artist}/${album.title}`}
-              className="bg-slate-500 px-3 py-2 mx-3 my-2 rounded-lg"
-              key={album.id}
-            >
-              <div className='h-48 w-48'>
-              <img className="object-fill" src={album.imageUrl} alt="Album art" />
-              </div>
-              <div className='mt-3'>
-              <h2 className="font-bold text-ellipsis overflow-hidden line-clamp-2">{album.title}</h2>
-              <p>{album.artist}</p>
-              </div>
-            </Link>
-          ))}
+        {/* Genre Title */}
+        <h1>{genre.toUpperCase()}</h1>
+        {/* Carousel wrapper */}
+        <div 
+          className="relative bg-pink-300 overflow-x-auto rounded-lg mb-5 md:h-80 scroll-bar"
+            ref={(el) => (carouselRefs.current[genre] = el)}
+            style={{ scrollSnapType: "x mandatory"}}
+        >
+            {/* Carousel Items */}
+            <div 
+              className="flex gap-5 ease-in-out" 
+              data-carousel-item
+              >
+            {albums.map((album) => (
+              <Link
+                to={`/album-info/${album.artist}/${album.title}`}
+                className="bg-slate-500 px-3 py-2 mx-3 my-2 rounded-lg"
+                key={album.id}
+              >
+                <div className='h-48 w-48'>
+                <img className="object-fill" src={album.imageUrl} alt="Album art" />
+                </div>
+                <div className='mt-3'>
+                <h2 className="font-bold text-ellipsis overflow-hidden line-clamp-2">{album.title}</h2>
+                <p className='text-ellipsis overflow-hidden line-clamp-1'>{album.artist}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
+
+
+    {/* Slider controls */}
+        <button
+          type="button"
+          className="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+          onClick={() => scrollCarousel(genre, "prev")}
+        >
+          <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 group-hover:bg-white/50">
+            <svg
+              className="w-4 h-4 text-white"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 6 10"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M5 1 1 5l4 4"
+              />
+            </svg>
+            <span className="sr-only">Previous</span>
+          </span>
+        </button>
+        <button
+          type="button"
+          className="absolute top-0 right-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+          onClick={() => scrollCarousel(genre, "next")}
+        >
+          <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 group-hover:bg-white/50">
+            <svg
+              className="w-4 h-4 text-white"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 6 10"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="m1 9 4-4-4-4"
+              />
+            </svg>
+            <span className="sr-only">Next</span>
+          </span>
+        </button>
       </div>
-
-
-  {/* Slider controls */}
-      <button
-        type="button"
-        className="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
-        onClick={() => scrollCarousel(genre, "prev")}
-      >
-        <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 group-hover:bg-white/50">
-          <svg
-            className="w-4 h-4 text-white"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 6 10"
-          >
-            <path
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M5 1 1 5l4 4"
-            />
-          </svg>
-          <span className="sr-only">Previous</span>
-        </span>
-      </button>
-      <button
-        type="button"
-        className="absolute top-0 right-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
-        onClick={() => scrollCarousel(genre, "next")}
-      >
-        <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 group-hover:bg-white/50">
-          <svg
-            className="w-4 h-4 text-white"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 6 10"
-          >
-            <path
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="m1 9 4-4-4-4"
-            />
-          </svg>
-          <span className="sr-only">Next</span>
-        </span>
-      </button>
-    </div>
-    ))
-)}
-
-
-
+      ))}
     </>
   )
 }
