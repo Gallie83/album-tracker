@@ -27,19 +27,17 @@ function SearchPage() {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
   };
-  console.log("PARAMS",params)
 
   useEffect(() => {
-    if(params.searchQuery)
-    setSearchValue(params.searchQuery);
-    console.log(params)
-    handleSearch()
+    const searchQuery = params.searchQuery || "";
+    setSearchValue(searchQuery);
+    handleSearch(searchValue)
 }, [params])
   
-  const handleSearch = async () => {
+  const handleSearch = async (query: string) => {
     try {
       // Searches for albums based on user input for searchValue
-      const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=album.search&album=${searchValue}&api_key=${apiKey}&format=json`)
+      const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=album.search&album=${query}&api_key=${apiKey}&format=json`)
       const data = await response.json()
       console.log(data)
         // Maps results to searchResults state to match SearchResults interface
@@ -64,8 +62,9 @@ function SearchPage() {
 
   return (
     <>
-    
-    <h1 className='text-9xl'>Album Search</h1>
+    <Link to={'/'}>
+    <h1 className='text-9xl'>VYNYL</h1>
+    </Link>
 
 {/* Search input for users to search for albums */}
 <input 
@@ -77,7 +76,7 @@ function SearchPage() {
 />
 
 
-<button className='m-3 p-1 border-2 border-white-600' onClick={handleSearch}>Search</button>
+<Link to={`/search/${searchValue}`} className='m-3 p-1 border-2 border-white-600' onClick={() => handleSearch(searchValue)}>Search</Link>
     
 
     {/* Check if searchResults exists and then map through releases */}

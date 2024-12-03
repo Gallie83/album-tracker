@@ -112,7 +112,9 @@ function App() {
 
   return (
     <>
-    <h1 className='text-9xl'>Album Search</h1>
+    <Link to={'/'}>
+    <h1 className='text-9xl'>VYNYL</h1>
+    </Link>
 
     {/* Search input for users to search for albums */}
     <input 

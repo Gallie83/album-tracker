@@ -64,6 +64,9 @@ function AlbumInfo() {
         
     return(
         <>
+            <Link to={'/'}>
+    <h1 className='text-9xl'>VYNYL</h1>
+    </Link>
         {album ? (
           // Outer div
           <div className="flex items-center justify-center h-screen">
