@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
 import Searchbar from './components/Searchbar';
+import Navbar from './components/Navbar/Navbar';
 
 const apiKey = import.meta.env.VITE_APP_API_KEY;
 
@@ -45,6 +46,7 @@ function App() {
     // Make sure tags is populated 
     if(tags.length === 0) return
 
+    // Fetches top albums based on genres
     const fetchTopAlbums = async () => {
     try {
       const albumPromises = tags.map(async (tag) => {
@@ -106,7 +108,7 @@ function App() {
 
   return (
     <>
-    {/* <Navbar /> */}
+    <Navbar />
 
     <Searchbar/>
 

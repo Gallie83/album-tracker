@@ -5,7 +5,7 @@ function Searchbar() {
   const params = useParams<{searchQuery:string}>();
   const navigate = useNavigate();
   
-
+  // Sends user to search page with search query as param
   const searchRedirect = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const searchValue = event.currentTarget.search.value
@@ -16,11 +16,13 @@ function Searchbar() {
 
   return (
     <>
+    {/* TODO: change sizing to match title */}
+
     <Link to={'/'}>
-    <h1 className='text-9xl'>VYNYL</h1>
+    <h1 className='text-9xl p-0 m-0'>VYNYL</h1>
     </Link>
 
-    {/* Search input for album searching */}
+    {/* Search input */}
     <form onSubmit={searchRedirect}  className="flex px-4 py-3 rounded-md border-2 overflow-hidden max-w-md mx-auto font-[sans-serif]">
   
       <input 
