@@ -108,7 +108,10 @@ function App() {
 
   return (
     <>
+    <div className="flex fixed top-0 left-0 ml-3 mt-3">
+
     <Navbar />
+    </div>
 
     <Searchbar/>
 

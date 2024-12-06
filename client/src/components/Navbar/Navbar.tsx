@@ -12,7 +12,7 @@ function Navbar() {
         data-dropdown-toggle="dropdown"
         onClick={() => setShowDropdown(!showDropdown)} // Correctly toggles the state
       >
-        <img src={VinylImage} alt="Vinyl Image" className="h-28 w-28" />
+        <img src={VinylImage} alt="Vinyl Image" className="h-20 w-20 hover:animate-spin" />
       </button>
 
       {/* Conditional Dropdown */}
@@ -39,22 +39,6 @@ function Navbar() {
                 className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
               >
                 Settings
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-              >
-                Earnings
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-              >
-                Sign out
               </a>
             </li>
           </ul>
