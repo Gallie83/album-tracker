@@ -65,6 +65,8 @@ function SearchPage() {
   // Display search results in a grid
   <div className="grid grid-cols-4 gap-5">
     {searchResults.results.map((album) => (
+
+      // TODO: handle special characters before directing users to next page
       <Link
         to={`/album-info/${album.artist}/${album.title}`}
         className="bg-slate-500 p-5 m-5 rounded-lg"
