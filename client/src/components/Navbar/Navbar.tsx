@@ -8,9 +8,9 @@ function Navbar() {
     <>
       {/* Button with image */}
       <button
-        id="dropdownDefaultButton"
-        data-dropdown-toggle="dropdown"
-        onClick={() => setShowDropdown(!showDropdown)} // Correctly toggles the state
+        // Toggles dropdown state
+        onClick={() => setShowDropdown(!showDropdown)} 
+        className='focus:outline-none'
       >
         <img src={VinylImage} alt="Vinyl Image" className="h-20 w-20 hover:animate-spin" />
       </button>
@@ -18,12 +18,10 @@ function Navbar() {
       {/* Conditional Dropdown */}
       {showDropdown && (
         <div
-          id="dropdown"
-          className="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700"
+        className="mt-2 bg-white divide-y divide-gray-100 dark:bg-gray-700 shadow rounded-lg w-44"
         >
           <ul
             className="py-2 text-sm text-gray-700 dark:text-gray-200"
-            aria-labelledby="dropdownDefaultButton"
           >
             <li>
               <a
