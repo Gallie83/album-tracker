@@ -19,6 +19,26 @@ mongoose.connect(uri)
 .then(() => console.log("Connected to DB"))
 .catch(console.error);
 
+// Import Schemas from models folder
+const User = require('./models/User');
+
+app.post('/user/new', async(req, res) => {
+    try {
+        const user = new User({
+            username: req.body.username,
+            email: req.body.email,
+            password: req.body.password,
+            usersAlbums: req.body.usersAlbums,
+            userSavedAlbums: req.body.userSavedAlbums,
+            groups: req.body.groups,
+        })
+        const savedUser = await user.save();
+        res.json(savedUser);
+    } catch (error) {
+        res.status(500).json({error: (error as Error).message})
+    }
+})
+
 const PORT: string | number = process.env.PORT || 3000;
 
 app.listen(PORT, () => {

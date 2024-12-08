@@ -3,6 +3,10 @@ import Searchbar from "./Searchbar"
 
 function AlbumInfo() {
 
+    const handleRegister = () => {
+        
+    }
+
     return(
       <>
 
@@ -16,7 +20,7 @@ function AlbumInfo() {
       <div className="flex items-center justify-center h-screen">
         <h3>Create an Account</h3>
 
-        <form action="">
+        <form onSubmit={handleRegister}>
             <input 
                 type="text"
                 name="username"
