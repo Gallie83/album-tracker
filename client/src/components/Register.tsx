@@ -3,8 +3,33 @@ import Searchbar from "./Searchbar"
 
 function AlbumInfo() {
 
-    const handleRegister = () => {
-        
+    const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
+        event?.preventDefault();
+        const newUser = {
+            username: event?.currentTarget.username.value,
+            email: event?.currentTarget.email.value,
+            password: event?.currentTarget.password.value,
+            userAlbums: [],
+            savedAlbums: [],
+            groups: [],
+        }
+
+        try {
+            const response = await fetch('http://localhost:3000/user/new', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify( newUser )
+            });
+            if(!response.ok) {
+                console.error("Failed to create new user:", response);
+                return
+            }
+            console.log("USER ADDED:", newUser); 
+        } catch (error) {
+            console.error("Error creating user:", error)
+        }
     }
 
     return(
@@ -20,7 +45,7 @@ function AlbumInfo() {
       <div className="flex items-center justify-center h-screen">
         <h3>Create an Account</h3>
 
-        <form onSubmit={handleRegister}>
+        <form onSubmit={handleRegister} className="text-black">
             <input 
                 type="text"
                 name="username"
@@ -34,8 +59,9 @@ function AlbumInfo() {
             <input 
                 type="password"
                 name="password"
-                placeholder="VinylLover123"
+                placeholder="Password"
             />
+            <button onClick={() => handleRegister}>Submit</button>
         </form>
       </div>
       </>
