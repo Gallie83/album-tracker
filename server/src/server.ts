@@ -12,7 +12,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const uri: string = process.env.MONGODB_URI || "";
-console.log(uri)
 
 // MongoDB connection setup
 mongoose.connect(uri)
@@ -20,7 +19,7 @@ mongoose.connect(uri)
 .catch(console.error);
 
 // Import Schemas from models folder
-const User = require('./models/User');
+const User = require('../models/User');
 
 app.post('/user/new', async(req, res) => {
     try {
@@ -39,7 +38,7 @@ app.post('/user/new', async(req, res) => {
     }
 })
 
-const PORT: string | number = process.env.PORT || 3000;
+const PORT: string | number = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
     console.log(`Server is running on PORT: ${PORT}`);
