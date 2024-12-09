@@ -1,32 +1,19 @@
 import Navbar from "./Navbar/Navbar"
 import Searchbar from "./Searchbar"
 
-function Register() {
+function Login() {
 
-    const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
+    const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
+        console.log("LOGIN")
         event?.preventDefault();
-        const newUser = {
-            username: event?.currentTarget.username.value,
-            email: event?.currentTarget.email.value,
-            password: event?.currentTarget.password.value,
-            userAlbums: [],
-            savedAlbums: [],
-            groups: [],
-        }
 
         try {
-            const response = await fetch('http://localhost:5000/user/new', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify( newUser )
-            });
+            const response = await fetch('http://localhost:5000/users');
             if(!response.ok) {
-                console.error("Failed to create new user:", response);
+                console.error("Failed to Fetch users:", response.statusText);
                 return
             }
-            console.log("USER ADDED:", newUser); 
+            console.log("USERS:", response); 
         } catch (error) {
             console.error("Error creating user:", error)
         }
@@ -46,7 +33,7 @@ function Register() {
 
     <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-            <form method="POST" onSubmit={handleRegister}>
+            <form method="POST" onSubmit={handleLogin}>
                 <div>
                     <label htmlFor="email" className="block text-sm font-medium leading-5  text-gray-700">Username</label>
                     <div className="mt-1 relative rounded-md shadow-sm">
@@ -80,7 +67,7 @@ function Register() {
                     <span className="block w-full rounded-md shadow-sm">
                         <button type="submit"
                             className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
-                            Create account
+                            Login
                         </button>
                     </span>
                 </div>
@@ -93,4 +80,4 @@ function Register() {
     )
 }
 
-export default Register
+export default Login

@@ -21,6 +21,17 @@ mongoose.connect(uri)
 // Import Schemas from models folder
 const User = require('../models/User');
 
+app.get('/users', async(req, res) => {
+    try {
+        const users = await User.find();
+        res.setHeader('Content-Type', 'application/json');
+        res.json(users)
+        console.log(users)
+    } catch (error) {
+        res.status(500).json({ error: (error as Error).message})
+    }
+})
+
 app.post('/user/new', async(req, res) => {
     try {
         const user = new User({
