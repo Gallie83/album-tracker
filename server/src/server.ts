@@ -2,6 +2,10 @@ import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+// AWS Cognito import
+import { Issuer, generators } from 'openid-client';
+import session from 'express-session';
+
 
 dotenv.config();
 
@@ -12,6 +16,25 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const uri: string = process.env.MONGODB_URI || "";
+
+let client;
+// Initialize OpenID Client
+async function initializeClient() {
+    const issuer = await Issuer.discover('https://cognito-idp.us-east-1.amazonaws.com/us-east-1_wMTwWN3bb');
+    client = new issuer.Client({
+        client_id: '6hpe4kcbkvf9hogee7kg0bo1h3',
+        client_secret: '<client secret>',
+        redirect_uris: ['https://d84l1y8p4kdic.cloudfront.net'],
+        response_types: ['code']
+    });
+};
+initializeClient().catch(console.error);
+
+app.use(session({
+    secret: 'some secret',
+    resave: false,
+    saveUninitialized: false
+}));
 
 // MongoDB connection setup
 mongoose.connect(uri)
@@ -26,7 +49,6 @@ app.get('/users', async(req, res) => {
         const users = await User.find();
         res.setHeader('Content-Type', 'application/json');
         res.json(users)
-        console.log(users)
     } catch (error) {
         res.status(500).json({ error: (error as Error).message})
     }
