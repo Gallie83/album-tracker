@@ -18,6 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const uri: string = process.env.MONGODB_URI || "";
+const user_pool_domain: string = process.env.AMAZON_USER_POOL_DOMAIN || "";
 
 let client: Client;
 
@@ -44,6 +45,7 @@ interface CustomSession extends Session {
     userInfo?: any;
     nonce?: string;
     state?: string;
+    returnUrl: string;
 }
 
 // AuthenticatedRequest includes the custom session properties
@@ -53,47 +55,61 @@ interface AuthenticatedRequest extends Request {
 }
 
 // Middleware to check if a user is authenticated
-const checkAuth = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    req.isAuthenticated = !!req.session.userInfo;
+const checkAuth = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): void => {
+    const typedReq = req as AuthenticatedRequest; // Explicitly type req
+    typedReq.isAuthenticated = !!typedReq.session?.userInfo; // Use optional chaining for safety
     next();
 };
 
 // Home Route
-app.get('/', checkAuth, (req: AuthenticatedRequest, res: Response) => {
+app.get('/', checkAuth, (req: Request, res: Response) => {
+    const typedReq = req as AuthenticatedRequest; // Type req once in the handler
     res.send({
-        isAuthenticated: req.isAuthenticated,
-        userInfo: req.session.userInfo || null,
+        isAuthenticated: typedReq.isAuthenticated,
+        userInfo: typedReq.session?.userInfo || null, // Safely access session.userInfo
     });
 });
 
+
 // Login Route
-app.get('/login', (req: AuthenticatedRequest, res: Response) => {
+app.get('/login', (req, res) => {
+    const typedReq = req as AuthenticatedRequest;
     const nonce = generators.nonce();
     const state = generators.state();
 
-    req.session.nonce = nonce;
-    req.session.state = state;
+    typedReq.session.nonce = nonce;
+    typedReq.session.state = state;
+
+    // Assign return URL or default to '/'
+    const returnUrl = req.query.returnUrl || '/';
+    typedReq.session.returnUrl = returnUrl as string;
 
     const authUrl = client.authorizationUrl({
         scope: 'openid email',
         state,
         nonce,
+        redirect_uri: 'http://localhost:5173/'
     });
 
     res.redirect(authUrl);
 });
 
 // Callback Route
-app.get('/callback', async (req: AuthenticatedRequest, res: Response) => {
+app.get('/callback', async (req, res) => {
+    const typedReq = req as AuthenticatedRequest;
     try {
-        const params = client.callbackParams(req);
+        const params = client.callbackParams(typedReq);
     
         const tokenSet = await client.callback(
             'https://d84l1y8p4kdic.cloudfront.net',
             params,
             {
-                nonce: req.session.nonce as string,
-                state: req.session.state as string,
+                nonce: typedReq.session.nonce as string,
+                state: typedReq.session.state as string,
             }
         );
     
@@ -102,9 +118,12 @@ app.get('/callback', async (req: AuthenticatedRequest, res: Response) => {
         }
     
         const userInfo = await client.userinfo(tokenSet.access_token);
-        req.session.userInfo = userInfo;
+        typedReq.session.userInfo = userInfo;
+
+        // Redirect to original return URL or default to '/'
+        const returnUrl = typedReq.session.returnUrl || '/';
+        res.redirect(returnUrl);
     
-        res.redirect('/');
     } catch (err) {
         console.error('Callback error:', err);
         res.redirect('/');
@@ -117,7 +136,7 @@ app.get('/callback', async (req: AuthenticatedRequest, res: Response) => {
                 console.error('Session destruction failed:', err);
             }
         });
-        const logoutUrl = `https://<user pool domain>/logout?client_id=6hpe4kcbkvf9hogee7kg0bo1h3&logout_uri=<logout uri>`;
+        const logoutUrl = `https://<user pool domain>/logout?client_id=6hpe4kcbkvf9hogee7kg0bo1h3&logout_uri=http://localhost:5173/`;
         res.redirect(logoutUrl);
     });
     
@@ -125,11 +144,12 @@ app.get('/callback', async (req: AuthenticatedRequest, res: Response) => {
 });
 
 // Logout Route
-app.get('/logout', (req: AuthenticatedRequest, res: Response) => {
-    req.session.destroy((err) => {
+app.get('/logout', (req, res) => {
+    const typedReq = req as AuthenticatedRequest;
+    typedReq.session.destroy((err) => {
         if(err) { console.error('Session destruction failed:', err); }
     });
-    const logoutUrl = `https://<user pool domain>/logout?client_id=6hpe4kcbkvf9hogee7kg0bo1h3&logout_uri=https://d84l1y8p4kdic.cloudfront.net`;
+    const logoutUrl = `https://${user_pool_domain}/logout?client_id=6hpe4kcbkvf9hogee7kg0bo1h3&logout_uri=https://d84l1y8p4kdic.cloudfront.net`;
     res.redirect(logoutUrl);
 });
 

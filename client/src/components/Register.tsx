@@ -15,7 +15,8 @@ function Register() {
 
     const handleLogin = async () => {
         try {
-            window.location.href = '/login';
+            const returnUrl = encodeURIComponent(window.location.pathname || '/');
+            window.location.href = `/login?returnUrl=${returnUrl}`;
         } catch (error) {
             console.error('Login failed:', error);
         }
