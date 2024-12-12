@@ -19,6 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const uri: string = process.env.MONGODB_URI || "";
 const user_pool_domain: string = process.env.AMAZON_USER_POOL_DOMAIN || "";
+const client_secret: string = process.env.AMAZON_CLIENT_SECRET || "";
 
 let client: Client;
 
@@ -27,12 +28,12 @@ async function initializeClient() {
     const issuer = await Issuer.discover('https://cognito-idp.us-east-1.amazonaws.com/us-east-1_wMTwWN3bb');
     client = new issuer.Client({
         client_id: '6hpe4kcbkvf9hogee7kg0bo1h3',
-        client_secret: '<client secret>',
-        redirect_uris: ['https://d84l1y8p4kdic.cloudfront.net'],
+        client_secret: `${client_secret}`,
+        redirect_uris: ['http://localhost:5000/callback'],
         response_types: ['code']
     });
 };
-initializeClient().catch(console.error);
+initializeClient().then(() => {console.log('Client setup complete')}).catch(console.error);
 
 // Session Middleware
 app.use(session({
@@ -89,10 +90,11 @@ app.get('/login', (req, res) => {
     typedReq.session.returnUrl = returnUrl as string;
 
     const authUrl = client.authorizationUrl({
-        scope: 'openid email',
+        response_type: 'code',
+        scope: 'openid email phone',
         state,
         nonce,
-        redirect_uri: 'http://localhost/5000/callback'
+        redirect_uri: 'http://localhost:5000/callback'
     });
 
     res.redirect(authUrl);
@@ -105,7 +107,7 @@ app.get('/callback', async (req, res) => {
         const params = client.callbackParams(typedReq);
     
         const tokenSet = await client.callback(
-            'https://d84l1y8p4kdic.cloudfront.net',
+            'https://localhost:5000/callback',
             params,
             {
                 nonce: typedReq.session.nonce as string,
@@ -119,6 +121,7 @@ app.get('/callback', async (req, res) => {
     
         const userInfo = await client.userinfo(tokenSet.access_token);
         typedReq.session.userInfo = userInfo;
+        console.log('User info:', typedReq.session.userInfo)
 
         // Redirect to original return URL or default to '/'
         const returnUrl = typedReq.session.returnUrl || 'http://localhost:5173';
@@ -126,7 +129,7 @@ app.get('/callback', async (req, res) => {
     
     } catch (err) {
         console.error('Callback error:', err);
-        res.redirect('/');
+        res.redirect('http://localhost:5173/register');
     }
     
     // Logout route
