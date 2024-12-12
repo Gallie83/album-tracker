@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import VinylImage from './vinyl-image.png';
+import { Link } from 'react-router-dom';
 
 function Navbar() {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
@@ -24,12 +25,12 @@ function Navbar() {
             className="py-2 text-sm text-gray-700 dark:text-gray-200"
           >
             <li>
-              <a
-                href="#"
+              <Link
+                to={'/register'}
                 className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
               >
-                Dashboard
-              </a>
+                Register
+              </Link>
             </li>
             <li>
               <a

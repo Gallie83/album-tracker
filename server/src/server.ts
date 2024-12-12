@@ -92,7 +92,7 @@ app.get('/login', (req, res) => {
         scope: 'openid email',
         state,
         nonce,
-        redirect_uri: 'http://localhost:5173/'
+        redirect_uri: 'http://localhost/5000/callback'
     });
 
     res.redirect(authUrl);
@@ -121,7 +121,7 @@ app.get('/callback', async (req, res) => {
         typedReq.session.userInfo = userInfo;
 
         // Redirect to original return URL or default to '/'
-        const returnUrl = typedReq.session.returnUrl || '/';
+        const returnUrl = typedReq.session.returnUrl || 'http://localhost:5173';
         res.redirect(returnUrl);
     
     } catch (err) {
