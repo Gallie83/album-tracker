@@ -19,15 +19,17 @@ app.use(express.urlencoded({ extended: true }));
 
 const uri: string = process.env.MONGODB_URI || "";
 const user_pool_domain: string = process.env.AMAZON_USER_POOL_DOMAIN || "";
+const client_id: string = process.env.AMAZON_CLIENT_ID || "";
 const client_secret: string = process.env.AMAZON_CLIENT_SECRET || "";
+
 
 let client: Client;
 
 // Initialize OpenID Client
 async function initializeClient() {
-    const issuer = await Issuer.discover('https://cognito-idp.us-east-1.amazonaws.com/us-east-1_wMTwWN3bb');
+    const issuer = await Issuer.discover(`https://cognito-idp.us-east-1.amazonaws.com/${user_pool_domain}`);
     client = new issuer.Client({
-        client_id: '6hpe4kcbkvf9hogee7kg0bo1h3',
+        client_id: `${client_id}`,
         client_secret: `${client_secret}`,
         redirect_uris: ['http://localhost:5000/callback'],
         response_types: ['code']
@@ -81,14 +83,14 @@ app.get('/login', (req, res) => {
     const typedReq = req as AuthenticatedRequest;
     const nonce = generators.nonce();
     const state = generators.state();
-
+    
     typedReq.session.nonce = nonce;
     typedReq.session.state = state;
-
+    
     // Assign return URL or default to '/'
     const returnUrl = req.query.returnUrl || '/';
     typedReq.session.returnUrl = returnUrl as string;
-
+    
     const authUrl = client.authorizationUrl({
         response_type: 'code',
         scope: 'openid email phone',
@@ -96,7 +98,7 @@ app.get('/login', (req, res) => {
         nonce,
         redirect_uri: 'http://localhost:5000/callback'
     });
-
+    
     res.redirect(authUrl);
 });
 
@@ -105,7 +107,7 @@ app.get('/callback', async (req, res) => {
     const typedReq = req as AuthenticatedRequest;
     try {
         const params = client.callbackParams(typedReq);
-    
+        
         const tokenSet = await client.callback(
             'https://localhost:5000/callback',
             params,
@@ -114,19 +116,19 @@ app.get('/callback', async (req, res) => {
                 state: typedReq.session.state as string,
             }
         );
-    
+        
         if (!tokenSet.access_token) {
             throw new Error('Access token is missing');
         }
-    
+        
         const userInfo = await client.userinfo(tokenSet.access_token);
         typedReq.session.userInfo = userInfo;
         console.log('User info:', typedReq.session.userInfo)
-
+        
         // Redirect to original return URL or default to '/'
         const returnUrl = typedReq.session.returnUrl || 'http://localhost:5173';
         res.redirect(returnUrl);
-    
+        
     } catch (err) {
         console.error('Callback error:', err);
         res.redirect('http://localhost:5173/register');
@@ -143,7 +145,7 @@ app.get('/callback', async (req, res) => {
         res.redirect(logoutUrl);
     });
     
- 
+    
 });
 
 // Logout Route
@@ -165,8 +167,8 @@ mongoose.connect(uri)
 // const User = require('../models/User');
 
 // app.get('/users', async(req, res) => {
-//     try {
-//         const users = await User.find();
+    //     try {
+        //         const users = await User.find();
 //         res.setHeader('Content-Type', 'application/json');
 //         res.json(users)
 //     } catch (error) {
