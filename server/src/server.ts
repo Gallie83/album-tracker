@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const uri: string = process.env.MONGODB_URI || "";
-const user_pool_domain: string = process.env.AMAZON_USER_POOL_DOMAIN || "";
+const user_pool_id: string = process.env.AMAZON_USER_POOL_ID || "";
 const client_id: string = process.env.AMAZON_CLIENT_ID || "";
 const client_secret: string = process.env.AMAZON_CLIENT_SECRET || "";
 
@@ -27,15 +27,16 @@ let client: Client;
 
 // Initialize OpenID Client
 async function initializeClient() {
-    const issuer = await Issuer.discover(`https://cognito-idp.us-east-1.amazonaws.com/${user_pool_domain}`);
+    const issuer = await Issuer.discover(`https://cognito-idp.us-east-1.amazonaws.com/${user_pool_id}`);
+    console.log("Issuer:", issuer);
     client = new issuer.Client({
         client_id: `${client_id}`,
         client_secret: `${client_secret}`,
-        redirect_uris: ['http://localhost:5000/callback'],
+        redirect_uris: ['http://localhost:5000/callback/'],
         response_types: ['code']
     });
 };
-initializeClient().then(() => {console.log('Client setup complete')}).catch(console.error);
+initializeClient().then(() => {console.log('Client:', client)}).catch(console.error);
 
 // Session Middleware
 app.use(session({
@@ -86,6 +87,10 @@ app.get('/login', (req, res) => {
     
     typedReq.session.nonce = nonce;
     typedReq.session.state = state;
+
+    console.log('Session Nonce:', typedReq.session.nonce);
+    console.log('Session State:', typedReq.session.state);
+
     
     // Assign return URL or default to '/'
     const returnUrl = req.query.returnUrl || '/';
@@ -96,8 +101,9 @@ app.get('/login', (req, res) => {
         scope: 'openid email phone',
         state,
         nonce,
-        redirect_uri: 'http://localhost:5000/callback'
+        redirect_uri: 'http://localhost:5000/callback/'
     });
+    console.log('Authorization URL:', authUrl);
     
     res.redirect(authUrl);
 });
@@ -105,11 +111,13 @@ app.get('/login', (req, res) => {
 // Callback Route
 app.get('/callback', async (req, res) => {
     const typedReq = req as AuthenticatedRequest;
+    console.log('Callback received:', typedReq.query);
     try {
         const params = client.callbackParams(typedReq);
+
         
         const tokenSet = await client.callback(
-            'https://localhost:5000/callback',
+            'http://localhost:5000/callback/',
             params,
             {
                 nonce: typedReq.session.nonce as string,
@@ -126,26 +134,13 @@ app.get('/callback', async (req, res) => {
         console.log('User info:', typedReq.session.userInfo)
         
         // Redirect to original return URL or default to '/'
-        const returnUrl = typedReq.session.returnUrl || 'http://localhost:5173';
+        const returnUrl = typedReq.session.returnUrl || 'http://localhost:5173/';
         res.redirect(returnUrl);
         
     } catch (err) {
         console.error('Callback error:', err);
         res.redirect('http://localhost:5173/register');
-    }
-    
-    // Logout route
-    app.get('/logout', (req, res) => {
-        req.session.destroy((err) => {
-            if (err) {
-                console.error('Session destruction failed:', err);
-            }
-        });
-        const logoutUrl = `https://<user pool domain>/logout?client_id=6hpe4kcbkvf9hogee7kg0bo1h3&logout_uri=http://localhost:5173/`;
-        res.redirect(logoutUrl);
-    });
-    
-    
+    }  
 });
 
 // Logout Route
@@ -154,7 +149,7 @@ app.get('/logout', (req, res) => {
     typedReq.session.destroy((err) => {
         if(err) { console.error('Session destruction failed:', err); }
     });
-    const logoutUrl = `https://${user_pool_domain}/logout?client_id=6hpe4kcbkvf9hogee7kg0bo1h3&logout_uri=https://d84l1y8p4kdic.cloudfront.net`;
+    const logoutUrl = `https://${user_pool_id}.auth.us-east-1.amazoncognito.com/logout?client_id=${client_id}&logout_uri=http://localhost:5173/`;
     res.redirect(logoutUrl);
 });
 
@@ -165,33 +160,6 @@ mongoose.connect(uri)
 
 // Import Schemas from models folder
 // const User = require('../models/User');
-
-// app.get('/users', async(req, res) => {
-    //     try {
-        //         const users = await User.find();
-//         res.setHeader('Content-Type', 'application/json');
-//         res.json(users)
-//     } catch (error) {
-//         res.status(500).json({ error: (error as Error).message})
-//     }
-// })
-
-// app.post('/user/new', async(req, res) => {
-//     try {
-//         const user = new User({
-//             username: req.body.username,
-//             email: req.body.email,
-//             password: req.body.password,
-//             usersAlbums: req.body.usersAlbums,
-//             userSavedAlbums: req.body.userSavedAlbums,
-//             groups: req.body.groups,
-//         })
-//         const savedUser = await user.save();
-//         res.json(savedUser);
-//     } catch (error) {
-//         res.status(500).json({error: (error as Error).message})
-//     }
-// })
 
 const PORT: string | number = process.env.PORT || 5000;
 
