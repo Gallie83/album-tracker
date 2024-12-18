@@ -93,7 +93,9 @@ app.get('/login', (req, res) => {
 
     
     // Assign return URL or default to '/'
-    const returnUrl = req.query.returnUrl || '/';
+    const returnUrl = req.query.returnUrl
+    ? `http://localhost:5173${req.query.returnUrl}`
+    : 'http://localhost:5173/';
     typedReq.session.returnUrl = returnUrl as string;
     
     const authUrl = client.authorizationUrl({
@@ -134,6 +136,7 @@ app.get('/callback', async (req, res) => {
         console.log('User info:', typedReq.session.userInfo)
         
         // Redirect to original return URL or default to '/'
+        console.log('Session Return URL:', typedReq.session.returnUrl);
         const returnUrl = typedReq.session.returnUrl || 'http://localhost:5173/';
         res.redirect(returnUrl);
         
