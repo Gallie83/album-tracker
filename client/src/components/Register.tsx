@@ -22,8 +22,10 @@ function Register() {
             });
             if (response.ok) {
                 const data = await response.json();
+                console.log("data:", data)
                 setIsAuthenticated(data.isAuthenticated);
                 setUserInfo(data.userInfo);
+                console.log("UserInfo:", userInfo)
             } else {
                 console.error('Failed to fetch authentication status');
             }
