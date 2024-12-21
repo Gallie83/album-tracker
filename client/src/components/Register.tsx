@@ -5,8 +5,8 @@ import Searchbar from "./Searchbar"
 function Register() {
 
     interface UserInfo {
-        username?: string;
-        email?: string;
+        username: string;
+        email: string;
         attributes?: Record<string, string>;
     }
 
@@ -22,9 +22,12 @@ function Register() {
             });
             if (response.ok) {
                 const data = await response.json();
-                console.log("data:", data)
                 setIsAuthenticated(data.isAuthenticated);
-                setUserInfo(data.userInfo);
+                // Set User info with pref_username as username
+                setUserInfo({
+                    ...data.userInfo,
+                    username: data.userInfo.preferred_username
+                });
                 console.log("UserInfo:", userInfo)
             } else {
                 console.error('Failed to fetch authentication status');

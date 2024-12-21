@@ -103,7 +103,7 @@ app.get('/login', (req, res) => {
     
     const authUrl = client.authorizationUrl({
         response_type: 'code',
-        scope: 'openid email phone',
+        scope: 'openid email phone profile',
         state,
         nonce,
         redirect_uri: 'http://localhost:5000/callback/'
