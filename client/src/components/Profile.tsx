@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Navbar from "./Navbar/Navbar"
 import Searchbar from "./Searchbar"
 
@@ -12,34 +12,6 @@ function Profile() {
 
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-
-    // Check if user is logged in 
-    const checkAuth = async () => {
-        try {
-            const response = await fetch('http://localhost:5000/', {
-                method: 'GET',
-                credentials: 'include', // Ensure cookies are sent
-            });
-            if (response.ok) {
-                const data = await response.json();
-                setIsAuthenticated(data.isAuthenticated);
-                // Set User info with pref_username as username
-                setUserInfo({
-                    ...data.userInfo,
-                    username: data.userInfo.preferred_username
-                });
-                console.log("UserInfo:", userInfo)
-            } else {
-                console.error('Failed to fetch authentication status');
-            }
-        } catch (error) {
-            console.error('Error checking authentication:', error);
-        }
-    };
-
-    useEffect(() => {
-        checkAuth(); // Check authentication on component mount
-    }, []);
 
     const handleLogin = async () => {
         try {
