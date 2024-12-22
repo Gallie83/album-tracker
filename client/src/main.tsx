@@ -6,7 +6,7 @@ import App from './App.tsx'
 import AlbumInfo from './components/AlbumInfo.tsx';
 import ArtistInfo from './components/ArtistInfo.tsx';
 import SearchPage from './components/SearchPage.tsx';
-import Register from './components/Register.tsx'
+import Profile from './components/Profile.tsx'
 
 const router = createBrowserRouter([
   {
@@ -18,8 +18,8 @@ const router = createBrowserRouter([
     element: <SearchPage />
   },
   {
-    path: '/register',
-    element: <Register />
+    path: '/profile',
+    element: <Profile />
   },
   {
     path: '/album-info/:artistName/:albumName',

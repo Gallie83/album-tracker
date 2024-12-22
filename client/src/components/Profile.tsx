@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Navbar from "./Navbar/Navbar"
 import Searchbar from "./Searchbar"
 
-function Register() {
+function Profile() {
 
     interface UserInfo {
         username: string;
@@ -96,4 +96,4 @@ function Register() {
     )
 }
 
-export default Register
+export default Profile
