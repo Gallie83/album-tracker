@@ -153,9 +153,13 @@ app.get('/callback', async (req, res) => {
 app.post('/logout', (req, res) => {
     const typedReq = req as AuthenticatedRequest;
     typedReq.session.destroy((err) => {
-        if(err) { console.error('Session destruction failed:', err); }
+        if(err) { 
+            console.error('Session destruction failed:', err); 
+            return res.status(500).send('Failed to destroy session');
+        }
     });
-    const logoutUrl = `https://${user_pool_id}.auth.us-east-1.amazoncognito.com/logout?client_id=${client_id}&logout_uri=http://localhost:5173/`;
+    const logoutUrl = `https://${user_pool_id.toLowerCase().replace('_', '')}.auth.us-east-1.amazoncognito.com/logout?client_id=${client_id}&logout_uri=${encodeURIComponent('http://localhost:5173/')}`;
+    console.log("logOutUrl:", logoutUrl)
     res.redirect(logoutUrl);
 });
 
