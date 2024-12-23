@@ -1,9 +1,21 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import VinylImage from './vinyl-image.png';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../../contexts/AuthContext';
 
 function Navbar() {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
+
+  const {isAuthenticated, username} = useContext(AuthContext)!;
+
+  const handleLogin = async () => {
+    try {
+        const returnUrl = window.location.pathname || '/';
+        window.location.replace(`http://localhost:5000/login?returnUrl=${returnUrl}`);
+    } catch (error) {
+        console.error('Login failed:', error);
+    }
+};
 
   return (
     <>
@@ -26,12 +38,16 @@ function Navbar() {
           >
             <li>
               {/* TODO: Add conditional render if user is logged on or not */}
-              <Link
-                to={'/profile'}
-                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-              >
-                Profile
-              </Link>
+              { isAuthenticated ? (
+                <Link
+                  to={'/profile'}
+                  className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                  >
+                  {username}'s Profile
+                </Link>
+              ) : (
+                <li onClick={handleLogin}>Login</li>
+                )}
             </li>
             <li>
               <a

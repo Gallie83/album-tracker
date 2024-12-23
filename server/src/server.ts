@@ -150,7 +150,7 @@ app.get('/callback', async (req, res) => {
 });
 
 // Logout Route
-app.get('/logout', (req, res) => {
+app.post('/logout', (req, res) => {
     const typedReq = req as AuthenticatedRequest;
     typedReq.session.destroy((err) => {
         if(err) { console.error('Session destruction failed:', err); }

@@ -14,7 +14,7 @@ function Profile() {
     // const [isAuthenticated, setIsAuthenticated] = useState(false);
     // const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
-    const { isAuthenticated, username, email} = useContext(AuthContext)!;
+    const { isAuthenticated, username, email, logout} = useContext(AuthContext)!;
 
     console.log("USER:", isAuthenticated, username, email )
 
@@ -27,21 +27,15 @@ function Profile() {
         }
     };
 
-    // const handleLogout = async () => {
-    //     try {
-    //         const response = await fetch('/logout', {
-    //             method: 'GET',
-    //         });
-    //         if (response.ok) {
-    //             setIsAuthenticated(false);
-    //             setUserInfo(null);
-    //         } else {
-    //             console.error('Logout failed:', response.statusText);
-    //         }
-    //     } catch (error) {
-    //         console.error('Logout failed:', error);
-    //     }
-    // };
+    // Calls logout function from AuthContext
+    const handleLogout = () => {
+        if(logout) {
+            // Confirmation message before logout
+            if(window.confirm('Are you sure you want to log out?')) {
+                logout();
+            }
+        }
+    };
 
     return(
       <>
@@ -59,7 +53,7 @@ function Profile() {
                 <div>
                     <h2>Welcome, {username}</h2>
                     <p>Your email: {email}</p>
-                    {/* <button onClick={handleLogout}>Logout</button> */}
+                    <button onClick={handleLogout}>Logout</button>
                 </div>
             ) : (
                 <div>

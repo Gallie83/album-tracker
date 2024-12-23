@@ -4,14 +4,16 @@ interface AuthState {
     isAuthenticated: boolean,
     username: string | null,
     email: string | null,
-    setAuthState?: Dispatch<SetStateAction<AuthState>>
+    // To handle Login/Logout
+    setAuthState?: Dispatch<SetStateAction<AuthState>>,
+    logout?: () => void
 }
 
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode}> = ({children}) => {
     // Intialise AuthState while Omitting setAuthState value 
-    const [authState, setAuthState] = useState<Omit<AuthState, "setAuthState">>({
+    const [authState, setAuthState] = useState<Omit<AuthState, "setAuthState" | "logout">>({
         isAuthenticated: false,
         username: null,
         email: null,
@@ -44,15 +46,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode}> = ({children})
                 }
             } catch (error) {
                 console.error('Error checking authentication:', error);
+                setAuthState({
+                    isAuthenticated: false,
+                    username: null,
+                    email: null,
+                });
             }
         };
-        console.log("UserInfo:", authState)
 
         checkAuth();
-    }, [])
+    }, []);
+
+    // Function to log user out and reset authState
+    const logout = () => {
+        // Return State to Unauthenticated
+        setAuthState({
+            isAuthenticated: false,
+            username: null,
+            email: null,
+        });
+        fetch('http://localhost:5000/logout', {
+            method: 'POST',
+            credentials: 'include'
+        }).then((response) => {
+            if(!response.ok) {
+                console.error('Failed to log out on the server')
+            }
+        }).catch((error) => {
+            console.error('Error logging out:', error)
+        });
+    }
 
     return(
-        <AuthContext.Provider value={{ ...authState }}>
+        <AuthContext.Provider value={{ ...authState, logout }}>
             {children}
         </AuthContext.Provider>
     )
