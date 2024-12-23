@@ -145,7 +145,7 @@ app.get('/callback', async (req, res) => {
         
     } catch (err) {
         console.error('Callback error:', err);
-        res.redirect('http://localhost:5173/register');
+        res.redirect('http://localhost:5173/profile');
     }  
 });
 

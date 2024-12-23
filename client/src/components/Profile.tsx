@@ -1,17 +1,22 @@
-import { useState } from "react";
+import { useContext } from "react";
 import Navbar from "./Navbar/Navbar"
 import Searchbar from "./Searchbar"
+import { AuthContext } from "../contexts/AuthContext";
 
 function Profile() {
 
-    interface UserInfo {
-        username: string;
-        email: string;
-        attributes?: Record<string, string>;
-    }
+    // interface UserInfo {
+    //     username: string;
+    //     email: string;
+    //     attributes?: Record<string, string>;
+    // }
 
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+    // const [isAuthenticated, setIsAuthenticated] = useState(false);
+    // const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+
+    const { isAuthenticated, username, email} = useContext(AuthContext)!;
+
+    console.log("USER:", isAuthenticated, username, email )
 
     const handleLogin = async () => {
         try {
@@ -22,21 +27,21 @@ function Profile() {
         }
     };
 
-    const handleLogout = async () => {
-        try {
-            const response = await fetch('/logout', {
-                method: 'GET',
-            });
-            if (response.ok) {
-                setIsAuthenticated(false);
-                setUserInfo(null);
-            } else {
-                console.error('Logout failed:', response.statusText);
-            }
-        } catch (error) {
-            console.error('Logout failed:', error);
-        }
-    };
+    // const handleLogout = async () => {
+    //     try {
+    //         const response = await fetch('/logout', {
+    //             method: 'GET',
+    //         });
+    //         if (response.ok) {
+    //             setIsAuthenticated(false);
+    //             setUserInfo(null);
+    //         } else {
+    //             console.error('Logout failed:', response.statusText);
+    //         }
+    //     } catch (error) {
+    //         console.error('Logout failed:', error);
+    //     }
+    // };
 
     return(
       <>
@@ -49,13 +54,12 @@ function Profile() {
     <Searchbar/>
 
         <div>
-            <h1>Amazon Cognito User Pool Demo</h1>
+            <h1>Your Profile</h1>
             {isAuthenticated ? (
                 <div>
-                    <h2>Welcome, {userInfo?.username || userInfo?.email}</h2>
-                    <p>Here are some attributes you can use as a developer:</p>
-                    <pre>{JSON.stringify(userInfo, null, 4)}</pre>
-                    <button onClick={handleLogout}>Logout</button>
+                    <h2>Welcome, {username}</h2>
+                    <p>Your email: {email}</p>
+                    {/* <button onClick={handleLogout}>Logout</button> */}
                 </div>
             ) : (
                 <div>

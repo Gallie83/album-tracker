@@ -30,6 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode}> = ({children})
                     const data = await response.json();
                     // Set User info with pref_username as username
                     setAuthState({
+                        isAuthenticated: true,
                         ...data.userInfo,
                         username: data.userInfo.preferred_username
                     });
