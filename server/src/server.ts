@@ -150,7 +150,8 @@ app.get('/callback', async (req, res) => {
 });
 
 // Logout Route
-app.post('/logout', (req, res) => {
+app.get('/logout', (req, res) => {
+    console.log("Logging out...")
     const typedReq = req as AuthenticatedRequest;
     typedReq.session.destroy((err) => {
         if(err) { 

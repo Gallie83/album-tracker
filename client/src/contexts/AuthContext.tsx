@@ -65,22 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode}> = ({children})
             username: null,
             email: null,
         });
-        fetch('http://localhost:5000/logout', {
-            method: 'POST',
-            credentials: 'include',
-        })
-        .then((response) => {
-            if (!response.ok) {
-                return response.text().then((text) => {
-                    console.error('Failed to log out on the server:', text);
-                });
-            }
-            console.log('Logout successful on the server');
-        })
-        .catch((error) => {
-            console.error('Error logging out:', error);
-        });
-        
+        window.location.href = 'http://localhost:5000/logout'
     }
 
     return(
