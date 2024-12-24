@@ -91,9 +91,6 @@ app.get('/login', (req, res) => {
     typedReq.session.nonce = nonce;
     typedReq.session.state = state;
 
-    console.log('Session Nonce:', typedReq.session.nonce);
-    console.log('Session State:', typedReq.session.state);
-
     
     // Assign return URL or default to '/'
     const returnUrl = req.query.returnUrl
@@ -108,7 +105,6 @@ app.get('/login', (req, res) => {
         nonce,
         redirect_uri: 'http://localhost:5000/callback/'
     });
-    console.log('Authorization URL:', authUrl);
     
     res.redirect(authUrl);
 });
@@ -116,7 +112,6 @@ app.get('/login', (req, res) => {
 // Callback Route
 app.get('/callback', async (req, res) => {
     const typedReq = req as AuthenticatedRequest;
-    console.log('Callback received:', typedReq.query);
     try {
         const params = client.callbackParams(typedReq);
 
@@ -136,10 +131,8 @@ app.get('/callback', async (req, res) => {
         
         const userInfo = await client.userinfo(tokenSet.access_token);
         typedReq.session.userInfo = userInfo;
-        console.log('User info:', typedReq.session.userInfo)
         
         // Redirect to original return URL or default to '/'
-        console.log('Session Return URL:', typedReq.session.returnUrl);
         const returnUrl = typedReq.session.returnUrl || 'http://localhost:5173/';
         res.redirect(returnUrl);
         
@@ -151,7 +144,6 @@ app.get('/callback', async (req, res) => {
 
 // Logout Route
 app.get('/logout', (req, res) => {
-    console.log("Logging out...")
     const typedReq = req as AuthenticatedRequest;
     typedReq.session.destroy((err) => {
         if(err) { 
@@ -160,7 +152,6 @@ app.get('/logout', (req, res) => {
         }
     });
     const logoutUrl = `https://${user_pool_id.toLowerCase().replace('_', '')}.auth.us-east-1.amazoncognito.com/logout?client_id=${client_id}&logout_uri=${encodeURIComponent('http://localhost:5173/')}`;
-    console.log("logOutUrl:", logoutUrl)
     res.redirect(logoutUrl);
 });
 

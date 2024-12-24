@@ -30,14 +30,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode}> = ({children})
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    // Set User info with pref_username as username
-                    setAuthState({
-                        isAuthenticated: true,
-                        ...data.userInfo,
-                        username: data.userInfo.preferred_username
-                    });
+
+                    if (data && data.userInfo && data.userInfo.preferred_username) {
+                        // Set User info with preferred_username as username
+                        setAuthState({
+                            isAuthenticated: true,
+                            ...data.userInfo,
+                            username: data.userInfo.preferred_username,
+                        });
+                    } else {
+                        // If User not logged in then reset state
+                        setAuthState({
+                            isAuthenticated: false,
+                            username: null,
+                            email: null,
+                        });
+                    }
                 } else {
-                    console.error('Failed to fetch authentication status');
+                    console.error('Failed to fetch authentication status', response.statusText);
                     setAuthState({
                         isAuthenticated: false,
                         username: null,
@@ -65,6 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode}> = ({children})
             username: null,
             email: null,
         });
+        // Call to servers logout route which will then redirect to homepage
         window.location.href = 'http://localhost:5000/logout'
     }
 
