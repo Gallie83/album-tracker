@@ -1,7 +1,8 @@
 import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import mongoose from 'mongoose';
+import mongoose, { models } from 'mongoose';
 import dotenv from 'dotenv';
+import { User } from '../models/User';
 // AWS Cognito import
 import session from 'express-session';
 import { Issuer, generators, Client } from 'openid-client';
@@ -20,6 +21,7 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Environment Variables
 const uri: string = process.env.MONGODB_URI || "";
 const user_pool_id: string = process.env.AMAZON_USER_POOL_ID || "";
 const client_id: string = process.env.AMAZON_CLIENT_ID || "";
@@ -67,17 +69,17 @@ const checkAuth = (
     res: Response,
     next: NextFunction
 ): void => {
-    const typedReq = req as AuthenticatedRequest; // Explicitly type req
-    typedReq.isAuthenticated = !!typedReq.session?.userInfo; // Use optional chaining for safety
+    const typedReq = req as AuthenticatedRequest; 
+    typedReq.isAuthenticated = !!typedReq.session?.userInfo; 
     next();
 };
 
 // Home Route
 app.get('/', checkAuth, (req: Request, res: Response) => {
-    const typedReq = req as AuthenticatedRequest; // Type req once in the handler
+    const typedReq = req as AuthenticatedRequest; 
     res.send({
         isAuthenticated: typedReq.isAuthenticated,
-        userInfo: typedReq.session?.userInfo || null, // Safely access session.userInfo
+        userInfo: typedReq.session?.userInfo || null
     });
 });
 
@@ -92,7 +94,7 @@ app.get('/login', (req, res) => {
     typedReq.session.state = state;
 
     
-    // Assign return URL or default to '/'
+    // Assign return URL or default to '/profile'
     const returnUrl = req.query.returnUrl
     ? `http://localhost:5173${req.query.returnUrl}`
     : 'http://localhost:5173/profile';
@@ -131,6 +133,21 @@ app.get('/callback', async (req, res) => {
         
         const userInfo = await client.userinfo(tokenSet.access_token);
         typedReq.session.userInfo = userInfo;
+
+        // Check MongoDb if user exists, if not, create new
+        let user = await User.findOne({ cognitoId: userInfo.sub });
+
+        if(!user) {     
+            user = new User({
+                cognitoId: userInfo.sub,
+                username: userInfo.preffered_username,
+                email: userInfo.email,
+                usersAlbums: [],
+                userSavedAlbums: [],
+                groups: [] 
+            });
+            await user.save();
+        }
         
         // Redirect to original return URL or default to '/profile'
         const returnUrl = typedReq.session.returnUrl || 'http://localhost:5173/profile';
@@ -155,13 +172,59 @@ app.get('/logout', (req, res) => {
     res.redirect(logoutUrl);
 });
 
+// Rate album Route
+app.post('/rate-album', checkAuth, async (req,res) => {
+    const typedReq = req as AuthenticatedRequest;
+
+    const { albumId, rating, title, artist } = typedReq.body;
+    
+    try {
+        if(!typedReq.session.userInfo) { 
+            return res.status(401).json({error: 'User not authenticated'})
+        }
+
+        // Set cognitoId and then search for user
+        const cognitoId = typedReq.session.userInfo.sub
+
+        const user = await User.findOne({ cognitoId });
+
+        if(!user) {
+            return res.status(404).json({ message: 'Cannot find user' });
+        }
+
+        // Check if user already has album in usersAlbums
+        let album = user.usersAlbums.find(album => album.id === albumId);
+
+        // If not then add it
+        if(!album) {
+            user.usersAlbums.push({
+                id: albumId, 
+                title,
+                artist,
+                dateListened: new Date(),
+                // Set rating as null incase user doesn't want to add a rating
+                rating: null,
+            });
+        } else if( rating !== undefined) {
+            // Add rating if user has included it
+            album.rating = rating;
+        }
+
+        await user.save();
+        return res.status(200).json({
+            message: 'Album added to MyAlbums',
+            album
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 // MongoDB connection setup
 mongoose.connect(uri)
 .then(() => console.log("Connected to DB"))
 .catch(console.error);
-
-// Import Schemas from models folder
-// const User = require('../models/User');
 
 const PORT: string | number = process.env.PORT || 5000;
 

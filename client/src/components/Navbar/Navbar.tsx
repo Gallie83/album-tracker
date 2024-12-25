@@ -6,7 +6,7 @@ import { AuthContext } from '../../contexts/AuthContext';
 function Navbar() {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
 
-  const {isAuthenticated, username} = useContext(AuthContext)!;
+  const {isAuthenticated, username, logout} = useContext(AuthContext)!;
 
   const handleLogin = async () => {
     try {
@@ -15,7 +15,19 @@ function Navbar() {
     } catch (error) {
         console.error('Login failed:', error);
     }
-};
+  };
+
+  // Calls logout function from AuthContext
+  const handleLogout = () => {
+    if(logout) {
+        // Confirmation message before logout
+        if(window.confirm('Are you sure you want to log out?')) {
+            logout();
+        }
+    }
+  };
+
+
 
   return (
     <>
@@ -30,25 +42,26 @@ function Navbar() {
 
       {/* Conditional Dropdown */}
       {showDropdown && (
-        <div
-        className="mt-2 bg-white divide-y divide-gray-100 dark:bg-gray-700 shadow rounded-lg w-44"
-        >
-          <ul
-            className="py-2 text-sm text-gray-700 dark:text-gray-200"
-          >
-            <li>
-              {/* TODO: Add conditional render if user is logged on or not */}
+        <div className="mt-2 bg-white divide-y divide-gray-100 dark:bg-gray-700 shadow rounded-lg w-44">
+          <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
               { isAuthenticated ? (
-                <Link
-                  to={'/profile'}
-                  className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                  >
-                  {username}'s Profile
-                </Link>
+                <>
+                {/* TODO: Ensure consistent styling for Navbar elements - Link + button */}
+                  <li>
+                    <Link
+                      to={'/profile'}
+                      className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      >
+                      {username}'s Profile
+                    </Link>
+                  </li>
+                  <li>
+                    <button onClick={handleLogout}>Logout</button>
+                  </li>
+                </>
               ) : (
-                <li onClick={handleLogin}>Login</li>
+                <a onClick={handleLogin}>Login</a>
                 )}
-            </li>
             <li>
               <a
                 href="#"

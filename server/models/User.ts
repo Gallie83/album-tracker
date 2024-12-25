@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema({
+    cognitoId: {
+        type: String, 
+        required: true,
+        unique: true,
+    },
     username: {
         type: String,
         required: true,
@@ -10,10 +15,6 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true
-    },
-    password: {
-        type: String, 
-        required: true
     },
     usersAlbums: [
         {
@@ -57,4 +58,4 @@ const UserSchema = new mongoose.Schema({
     groups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group'}]
 });
 
-module.exports = mongoose.model('User', UserSchema)
+export const User = module.exports = mongoose.model('User', UserSchema);
