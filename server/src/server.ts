@@ -133,19 +133,28 @@ app.get('/callback', async (req, res) => {
         const userInfo = await client.userinfo(tokenSet.access_token);
         typedReq.session.userInfo = userInfo;
 
+        console.log("TypedReq USER INFO:",typedReq.session.userInfo)
+
+        console.log("USER MODEL:", User);
+
         // Check MongoDb if user exists, if not, create new
         let user = await User.findOne({ cognitoId: userInfo.sub });
 
         if(!user) {     
-            user = new User({
-                cognitoId: userInfo.sub,
-                username: userInfo.preffered_username,
-                email: userInfo.email,
-                usersAlbums: [],
-                userSavedAlbums: [],
-                groups: [] 
-            });
-            await user.save();
+            console.log("NEW USER")
+            try {
+                user = new User({
+                    cognitoId: userInfo.sub,
+                    username: userInfo.preferred_username,
+                    email: userInfo.email,
+                    usersAlbums: [],
+                    userSavedAlbums: [],
+                    groups: [] 
+                });
+                await user.save();
+            } catch ( error ) {
+                console.error('Error creating user:', error)
+            }
         }
         
         // Redirect to original return URL or default to '/profile'
