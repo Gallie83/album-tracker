@@ -183,6 +183,9 @@ app.post('/rate-album', checkAuth, async (req,res): Promise<void> => {
             return 
         }
 
+        console.log('Session:', typedReq.session);
+        console.log('User Info:', typedReq.session?.userInfo);
+
         // Set cognitoId and then search for user
         const cognitoId = typedReq.session.userInfo.sub
 

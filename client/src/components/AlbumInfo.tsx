@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom"
+import Navbar from "./Navbar/Navbar";
+import Searchbar from "./Searchbar";
 // import { AuthContext } from "../contexts/AuthContext";
 
 const apiKey = import.meta.env.VITE_APP_API_KEY;
@@ -88,9 +90,12 @@ function AlbumInfo() {
       
   return(
     <>
-      <Link to={'/'}>
-        <h1 className='text-9xl'>VYNYL</h1>
-      </Link>
+      <div className="flex fixed top-0 left-0 ml-3 mt-3">
+
+      <Navbar />
+      </div>
+
+      <Searchbar/>
       {album ? (
         // Outer div
         <div className="flex items-center justify-center h-screen">
