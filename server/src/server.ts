@@ -8,7 +8,6 @@ import session from 'express-session';
 import { Issuer, generators, Client } from 'openid-client';
 import { Session, SessionData} from 'express-session';
 
-
 dotenv.config();
 
 const app: Express = express();
@@ -173,14 +172,15 @@ app.get('/logout', (req, res) => {
 });
 
 // Rate album Route
-app.post('/rate-album', checkAuth, async (req,res) => {
+app.post('/rate-album', checkAuth, async (req,res): Promise<void> => {
     const typedReq = req as AuthenticatedRequest;
 
     const { albumId, rating, title, artist } = typedReq.body;
     
     try {
         if(!typedReq.session.userInfo) { 
-            return res.status(401).json({error: 'User not authenticated'})
+            res.status(401).json({error: 'User not authenticated'})
+            return 
         }
 
         // Set cognitoId and then search for user
@@ -189,7 +189,8 @@ app.post('/rate-album', checkAuth, async (req,res) => {
         const user = await User.findOne({ cognitoId });
 
         if(!user) {
-            return res.status(404).json({ message: 'Cannot find user' });
+            res.status(404).json({ message: 'Cannot find user' });
+            return 
         }
 
         // Check if user already has album in usersAlbums
@@ -211,13 +212,13 @@ app.post('/rate-album', checkAuth, async (req,res) => {
         }
 
         await user.save();
-        return res.status(200).json({
+        res.status(200).json({
             message: 'Album added to MyAlbums',
             album
         });
     } catch (err) {
         console.error(err);
-        return res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
