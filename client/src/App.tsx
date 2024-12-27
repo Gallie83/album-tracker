@@ -12,6 +12,7 @@ const apiKey = import.meta.env.VITE_APP_API_KEY;
 // Interfaces
 interface Album {
   id: string,
+  mbid: string,
   title: string,
   artist: string,
   imageUrl: string 
@@ -61,11 +62,15 @@ function App() {
         // Set data for the genre
         return {
           [tag]: data.albums.album.map((release: {
+            mbid: string,
             name: string;
             artist: { name: string };
             image: { "#text": string; size: string }[];
           }) => ({
+            // Generate ID incase album appears in mulitple genres to prevent key errors
             id: uuidv4(),
+            // Mbid to send as param to AlbumInfo page
+            mbid: release.mbid,
             title: release.name,
             artist: release.artist.name,
             imageUrl: release.image?.find(img => img.size === "extralarge")?.["#text"] || "",
@@ -82,7 +87,6 @@ function App() {
       const albumData = results.reduce((acc, curr) => ({ ...acc, ...curr }), {});
   
       setAlbumsByGenre(albumData);
-      console.log("ABG", albumsByGenre);
     } catch (error) {
       console.error("Error fetching albums by genre:", error);
     }
@@ -138,7 +142,7 @@ function App() {
               >
             {albums.map((album) => (
               <Link
-                to={`/album-info/${album.artist}/${album.title}`}
+                to={`/album-info/${album.artist}/${album.title}/${album.mbid}`}
                 className="bg-slate-500 px-3 py-2 mx-3 my-2 rounded-lg"
                 key={album.id}
               >

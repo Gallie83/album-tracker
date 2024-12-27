@@ -23,7 +23,7 @@ const router = createBrowserRouter([
     element: <Profile />
   },
   {
-    path: '/album-info/:artistName/:albumName',
+    path: '/album-info/:artistName/:albumName/:albumMbid',
     element: <AlbumInfo />
   },
   {

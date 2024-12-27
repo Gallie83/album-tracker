@@ -7,7 +7,7 @@ import Searchbar from "./Searchbar";
 const apiKey = import.meta.env.VITE_APP_API_KEY;
 
 interface AlbumInfo {
-    id: string,
+    mbid: string,
     title: string,
     artist: string,
     imageUrl: string,
@@ -19,18 +19,17 @@ interface AlbumInfo {
 }
 
 function AlbumInfo() {
-  const params = useParams<{artistName:string , albumName: string, albumId: string}>();
+  const params = useParams<{artistName:string , albumName: string, albumMbid: string}>();
   const [album, setAlbum] = useState<AlbumInfo>();
   const [open, setOpen] = useState(false);
 
   // const { isAuthenticated } = useContext(AuthContext)!;
   
-  // const name = params.artistName;
-  const albumInfo = async (artist: string, album: string) => {
+  const albumInfo = async (mbid: string, artist: string, album: string) => {
     try {
       const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=album.getInfo&api_key=${apiKey}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`);
       const data = await response.json()
-      console.log(data)
+      console.log("ALBUM DATA:", data)
       if (data.album) {
         // Check if tracklist is an array/single object
         const tracks = Array.isArray(data.album.tracks.track)
@@ -38,7 +37,7 @@ function AlbumInfo() {
           : [data.album.tracks.track]; // Wrap single object in an array
       
         const fetchedAlbum: AlbumInfo = {
-          id: data.album.mbid,
+          mbid: mbid,
           title: album,
           artist: artist,
           imageUrl:
@@ -60,13 +59,14 @@ function AlbumInfo() {
   } 
 
   useEffect(() => {
-      if(params.artistName && params.albumName )
-      albumInfo(params.artistName, params.albumName)
+      if(params.artistName && params.albumName && params.albumMbid )
+      albumInfo(params.artistName, params.albumName, params.albumMbid)
   }, [params])
 
-  const addToUsersAlbums = async (id: string, title: string, artist: string) => {
+  const addToUsersAlbums = async (mbid: string, title: string, artist: string) => {
     try {
-      const albumData = {albumId: id, title, artist}
+      const albumData = {albumId: mbid, title, artist};
+      console.log(albumData)
 
       const response = await fetch(`http://localhost:5000/rate-album`, {
         method: 'POST',
@@ -99,7 +99,7 @@ function AlbumInfo() {
       {album ? (
         // Outer div
         <div className="flex items-center justify-center h-screen">
-          <div key={album.id} className="flex w-11/12 items-stretch bg-pink-300 border border-gray-200 rounded-lg md:flex-row p-5">
+          <div key={album.mbid} className="flex w-11/12 items-stretch bg-pink-300 border border-gray-200 rounded-lg md:flex-row p-5">
             {/* Left Section with Image and Track List */}
             <div className="flex flex-col w-2/5 p-2 bg-slate-600">
               <img
@@ -153,7 +153,7 @@ function AlbumInfo() {
             {/* Right Section with Summary */}
             <div className="w-3/5 bg-green-300 flex flex-col justify-between p-6 px-16 leading-normal">
 
-                  <button onClick={() => addToUsersAlbums(album.id, album.title, album.artist)}>Add</button>
+                  <button onClick={() => addToUsersAlbums(album.mbid, album.title, album.artist)}>Add</button>
 
             <div>
               <h4 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{album.title}</h4>
