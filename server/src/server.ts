@@ -180,13 +180,11 @@ app.get('/logout', (req, res) => {
     res.redirect(logoutUrl);
 });
 
-// Rate album Route
-app.post('/rate-album', checkAuth, async (req,res): Promise<void> => {
+// Route for getting usersAlbums
+app.get('/user-albums', checkAuth, async (req,res) => {
     const typedReq = req as AuthenticatedRequest;
-
-    const { albumId, rating, title, artist } = typedReq.body;
-    
-    try {
+    try {   
+        // Ensure user is authenticated
         if(!typedReq.session.userInfo) { 
             res.status(401).json({error: 'User not authenticated'})
             return 
@@ -194,6 +192,34 @@ app.post('/rate-album', checkAuth, async (req,res): Promise<void> => {
 
         console.log('Session:', typedReq.session);
         console.log('User Info:', typedReq.session?.userInfo);
+
+        const cognitoId = typedReq.session.userInfo.sub;
+        
+        const user = await User.findOne({cognitoId});
+        
+        if(!user) {
+            res.status(404).json({ message: 'Cannot find user' });
+            return 
+        }
+
+        res.json({usersAlbums: user.usersAlbums})
+    } catch (error) {
+        console.error(error);
+    }
+})
+
+// Rate album Route
+app.post('/rate-album', checkAuth, async (req,res): Promise<void> => {
+    const typedReq = req as AuthenticatedRequest;
+
+    const { albumId, rating, title, artist } = typedReq.body;
+    
+    try {
+        // Ensure user is authenticated
+        if(!typedReq.session.userInfo) { 
+            res.status(401).json({error: 'User not authenticated'})
+            return 
+        }
 
         // Set cognitoId and then search for user
         const cognitoId = typedReq.session.userInfo.sub

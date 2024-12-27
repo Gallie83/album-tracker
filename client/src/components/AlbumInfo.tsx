@@ -25,7 +25,7 @@ function AlbumInfo() {
 
   // const { isAuthenticated } = useContext(AuthContext)!;
   
-  const albumInfo = async (mbid: string, artist: string, album: string) => {
+  const albumInfo = async (artist: string, album: string, mbid: string) => {
     try {
       const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=album.getInfo&api_key=${apiKey}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`);
       const data = await response.json()

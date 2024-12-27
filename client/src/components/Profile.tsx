@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import Navbar from "./Navbar/Navbar"
 import Searchbar from "./Searchbar"
 import { AuthContext } from "../contexts/AuthContext";
@@ -17,6 +17,21 @@ function Profile() {
     const { isAuthenticated, username, email, logout} = useContext(AuthContext)!;
 
     console.log("USER:", isAuthenticated, username, email )
+
+    useEffect(() => {
+
+        const getUsersAlbums = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/user-albums');
+                const data = await response.json();
+                console.log("User albums",data.usersAlbums)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
+        getUsersAlbums();
+    }, [])
 
     const handleLogin = async () => {
         try {
@@ -53,6 +68,10 @@ function Profile() {
                 <div>
                     <h2>Welcome, {username}</h2>
                     <p>Your email: {email}</p>
+                    <div>
+                        Your albums:
+                        <p></p>
+                    </div>
                     <button onClick={handleLogout}>Logout</button>
                 </div>
             ) : (
