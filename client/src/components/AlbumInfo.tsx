@@ -22,6 +22,7 @@ function AlbumInfo() {
   const params = useParams<{artistName:string , albumName: string, albumMbid: string}>();
   const [album, setAlbum] = useState<AlbumInfo>();
   const [open, setOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   // const { isAuthenticated } = useContext(AuthContext)!;
   
@@ -59,34 +60,38 @@ function AlbumInfo() {
   } 
 
   useEffect(() => {
+    console.log("MODAL",modalOpen)
+  }, [modalOpen])
+
+  useEffect(() => {
       if(params.artistName && params.albumName && params.albumMbid )
       albumInfo(params.artistName, params.albumName, params.albumMbid)
   }, [params])
 
-  const addToUsersAlbums = async (mbid: string, title: string, artist: string) => {
-    try {
-      const albumData = {albumId: mbid, title, artist};
-      console.log(albumData)
+  // const addToUsersAlbums = async (mbid: string, title: string, artist: string) => {
+  //   try {
+  //     const albumData = {albumId: mbid, title, artist};
+  //     console.log(albumData)
 
-      const response = await fetch(`http://localhost:5000/rate-album`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(albumData),
-      });
+  //     const response = await fetch(`http://localhost:5000/rate-album`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       credentials: 'include',
+  //       body: JSON.stringify(albumData),
+  //     });
 
-      if(!response.ok) {
-        throw new Error(`Error: ${response.status}`)
-      }
+  //     if(!response.ok) {
+  //       throw new Error(`Error: ${response.status}`)
+  //     }
 
-      const data = await response.json();
-      console.log('Data:', data)
-    } catch (error) {
-      console.error('Error adding album to list:', error)
-    }
-  }
+  //     const data = await response.json();
+  //     console.log('Data:', data)
+  //   } catch (error) {
+  //     console.error('Error adding album to list:', error)
+  //   }
+  // }
       
   return(
     <>
@@ -153,7 +158,10 @@ function AlbumInfo() {
             {/* Right Section with Summary */}
             <div className="w-3/5 bg-green-300 flex flex-col justify-between p-6 px-16 leading-normal">
 
-                  <button onClick={() => addToUsersAlbums(album.mbid, album.title, album.artist)}>Add</button>
+                  <button 
+                    // onClick={() => addToUsersAlbums(album.mbid, album.title, album.artist)}
+                    onClick={() => setModalOpen(true)}
+                    data-modal-target="static-modal">Add</button>
 
             <div>
               <h4 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{album.title}</h4>
@@ -169,8 +177,43 @@ function AlbumInfo() {
               <a target="_blank" rel="noopener noreferrer" className="border border-black p-1 bg-stone-400" href={album.url}>More info</a>
 
             </div>
+
+            {/* Rating modal  */}
+            {modalOpen && ( 
+            <div data-modal-backdrop="static" className="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                <div className="relative p-4 w-full max-w-2xl max-h-full">
+                    {/* Modal content  */}
+                    <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                        {/* Modal header  */}
+                        <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                                Rate the album
+                            </h3>
+                            <button type="button" onClick={() => setModalOpen(false)} className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white">X</button>
+                        </div>
+                        {/* Modal body  */}
+                        <div className="p-4 md:p-5 space-y-4">
+                            <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                                With less than a month to go before the European Union enacts new consumer privacy laws for its citizens, companies around the world are updating their terms of service agreements to comply.
+                            </p>
+                            <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                                The European Union’s General Data Protection Regulation (G.D.P.R.) goes into effect on May 25 and is meant to ensure a common set of data rights in the European Union. It requires organizations to notify users as soon as possible of high-risk data breaches that could personally affect them.
+                            </p>
+                        </div>
+                        {/* Modal footer  */}
+                        <div className="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+                            <button data-modal-hide="static-modal" type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">I accept</button>
+                            <button data-modal-hide="static-modal" type="button" className="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Decline</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+)}
+
           </div>
-          </div>
+        </div>
+
+          
       
   ) : ( <p>ERROR</p> )}
     </>
