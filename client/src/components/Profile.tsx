@@ -3,11 +3,17 @@ import Navbar from "./Navbar/Navbar"
 import Searchbar from "./Searchbar"
 import { AuthContext } from "../contexts/AuthContext";
 
+interface Album {
+    mbid: string,
+    title: string,
+    artist: string
+}
+
 function Profile() {
 
     const { isAuthenticated, username, email, logout} = useContext(AuthContext)!;
 
-    const [userAlbums, setUsersAlbums] = useState([]);
+    const [usersAlbums, setUsersAlbums] = useState<Album[] | null>(null);
 
     console.log("USER:", isAuthenticated, username, email )
 
@@ -18,7 +24,7 @@ function Profile() {
                 const response = await fetch('http://localhost:5000/user-albums', {
                     credentials: 'include'
                 });
-                const data = await response.json();
+                const data: { usersAlbums: Album[] } = await response.json();
                 console.log("User albums",data.usersAlbums)
                 setUsersAlbums(data.usersAlbums);
             } catch (error) {
@@ -30,7 +36,7 @@ function Profile() {
         if(isAuthenticated) {
             getUsersAlbums();
         }
-    }, [])
+    }, [isAuthenticated])
 
     const handleLogin = async () => {
         try {
@@ -68,8 +74,18 @@ function Profile() {
                     <h2>Welcome, {username}</h2>
                     <p>Your email: {email}</p>
                     <div>
-                        Your albums:
-                        <p></p>
+                        {/* Condionally render users albums */}
+                        Your albums: {usersAlbums ? ( 
+                            usersAlbums.map((album, index) => (
+                            <p 
+                                // Ensure key is unique
+                                key={`${album.mbid}-${index}`}>
+                                    <b>{album.title}</b> - {album.artist}
+                            </p>
+                            )) 
+                        ) : ( 
+                            <p>No albums yet</p> 
+                            )}
                     </div>
                     <button onClick={handleLogout}>Logout</button>
                 </div>
