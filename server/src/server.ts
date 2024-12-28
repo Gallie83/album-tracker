@@ -186,6 +186,7 @@ app.get('/user-albums', checkAuth, async (req,res) => {
     try {   
         // Ensure user is authenticated
         if(!typedReq.session.userInfo) { 
+            console.log("TRSU:", typedReq.session.userInfo)
             res.status(401).json({error: 'User not authenticated'})
             return 
         }
@@ -203,8 +204,9 @@ app.get('/user-albums', checkAuth, async (req,res) => {
         }
 
         res.json({usersAlbums: user.usersAlbums})
+        console.log(user.usersAlbums)
     } catch (error) {
-        console.error(error);
+        console.log("USERS ALBUMS ERROR:",error);
     }
 })
 

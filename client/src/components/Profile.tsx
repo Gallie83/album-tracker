@@ -1,36 +1,35 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import Navbar from "./Navbar/Navbar"
 import Searchbar from "./Searchbar"
 import { AuthContext } from "../contexts/AuthContext";
 
 function Profile() {
 
-    // interface UserInfo {
-    //     username: string;
-    //     email: string;
-    //     attributes?: Record<string, string>;
-    // }
-
-    // const [isAuthenticated, setIsAuthenticated] = useState(false);
-    // const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-
     const { isAuthenticated, username, email, logout} = useContext(AuthContext)!;
+
+    const [userAlbums, setUsersAlbums] = useState([]);
 
     console.log("USER:", isAuthenticated, username, email )
 
     useEffect(() => {
-
+        // Fetch all albums in usersAlbums
         const getUsersAlbums = async () => {
             try {
-                const response = await fetch('http://localhost:5000/user-albums');
+                const response = await fetch('http://localhost:5000/user-albums', {
+                    credentials: 'include'
+                });
                 const data = await response.json();
                 console.log("User albums",data.usersAlbums)
+                setUsersAlbums(data.usersAlbums);
             } catch (error) {
                 console.log(error)
             }
         }
 
-        getUsersAlbums();
+        // Only fetch is user is logged in
+        if(isAuthenticated) {
+            getUsersAlbums();
+        }
     }, [])
 
     const handleLogin = async () => {
