@@ -93,6 +93,7 @@ function AlbumInfo() {
 
   // Receives rating from RatingModal(or as null if user decided to skip)
   const handleRating = (rating: number | null) => {
+    console.log("Value received:", rating)
     if(album) {
       addToUsersAlbums(album.mbid, album.title, album.artist, rating);
       closeModal();
@@ -168,10 +169,9 @@ function AlbumInfo() {
             {/* Right Section with Summary */}
             <div className="w-3/5 bg-green-300 flex flex-col justify-between p-6 px-16 leading-normal">
 
+            {/* If user is logged in, button opens RatingModal */}
             { isAuthenticated && (
-
               <button 
-              // onClick={() => addToUsersAlbums(album.mbid, album.title, album.artist)}
               onClick={() => setModalOpen(true)}
               data-modal-target="static-modal">
                   Add
