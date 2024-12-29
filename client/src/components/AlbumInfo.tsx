@@ -61,10 +61,6 @@ function AlbumInfo() {
   } 
 
   useEffect(() => {
-    console.log("MODAL",modalOpen)
-  }, [modalOpen])
-
-  useEffect(() => {
       if(params.artistName && params.albumName && params.albumMbid )
       albumInfo(params.artistName, params.albumName, params.albumMbid)
   }, [params])
@@ -93,6 +89,10 @@ function AlbumInfo() {
   //     console.error('Error adding album to list:', error)
   //   }
   // }
+
+  const closeModal = () => {
+    setModalOpen(false)
+  }
       
   return(
     <>
@@ -159,10 +159,12 @@ function AlbumInfo() {
             {/* Right Section with Summary */}
             <div className="w-3/5 bg-green-300 flex flex-col justify-between p-6 px-16 leading-normal">
 
-                  <button 
-                    // onClick={() => addToUsersAlbums(album.mbid, album.title, album.artist)}
-                    onClick={() => setModalOpen(true)}
-                    data-modal-target="static-modal">Add</button>
+              <button 
+                // onClick={() => addToUsersAlbums(album.mbid, album.title, album.artist)}
+                onClick={() => setModalOpen(true)}
+                data-modal-target="static-modal">
+                  Add
+              </button>
 
             <div>
               <h4 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{album.title}</h4>
@@ -180,7 +182,7 @@ function AlbumInfo() {
             </div>
 
             {/* Rating modal  */}
-            {modalOpen && ( <RatingModal></RatingModal> )}
+            {modalOpen && ( <RatingModal closeModal={closeModal}></RatingModal> )}
 
           </div>
         </div>
