@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useParams, Link } from "react-router-dom"
 import Navbar from "./Navbar/Navbar";
 import Searchbar from "./Searchbar";
 import RatingModal from "./modals/RatingModal";
-// import { AuthContext } from "../contexts/AuthContext";
+import { AuthContext } from "../contexts/AuthContext";
 
 const apiKey = import.meta.env.VITE_APP_API_KEY;
 
@@ -25,7 +25,7 @@ function AlbumInfo() {
   const [open, setOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
-  // const { isAuthenticated } = useContext(AuthContext)!;
+  const { isAuthenticated } = useContext(AuthContext)!;
   
   const albumInfo = async (artist: string, album: string, mbid: string) => {
     try {
@@ -65,30 +65,39 @@ function AlbumInfo() {
       albumInfo(params.artistName, params.albumName, params.albumMbid)
   }, [params])
 
-  // const addToUsersAlbums = async (mbid: string, title: string, artist: string) => {
-  //   try {
-  //     const albumData = {albumId: mbid, title, artist};
-  //     console.log(albumData)
+  // Adds album to usersAlbums array
+  const addToUsersAlbums = async (mbid: string, title: string, artist: string, rating: number | null) => {
+    try {
+      const albumData = {albumId: mbid, title, artist, rating};
+      console.log(albumData)
 
-  //     const response = await fetch(`http://localhost:5000/rate-album`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       credentials: 'include',
-  //       body: JSON.stringify(albumData),
-  //     });
+      const response = await fetch(`http://localhost:5000/rate-album`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(albumData),
+      });
 
-  //     if(!response.ok) {
-  //       throw new Error(`Error: ${response.status}`)
-  //     }
+      if(!response.ok) {
+        throw new Error(`Error: ${response.status}`)
+      }
 
-  //     const data = await response.json();
-  //     console.log('Data:', data)
-  //   } catch (error) {
-  //     console.error('Error adding album to list:', error)
-  //   }
-  // }
+      const data = await response.json();
+      console.log('Data:', data)
+    } catch (error) {
+      console.error('Error adding album to list:', error)
+    }
+  }
+
+  // Receives rating from RatingModal(or as null if user decided to skip)
+  const handleRating = (rating: number | null) => {
+    if(album) {
+      addToUsersAlbums(album.mbid, album.title, album.artist, rating);
+      closeModal();
+    }
+  }
 
   const closeModal = () => {
     setModalOpen(false)
@@ -159,12 +168,15 @@ function AlbumInfo() {
             {/* Right Section with Summary */}
             <div className="w-3/5 bg-green-300 flex flex-col justify-between p-6 px-16 leading-normal">
 
+            { isAuthenticated && (
+
               <button 
-                // onClick={() => addToUsersAlbums(album.mbid, album.title, album.artist)}
-                onClick={() => setModalOpen(true)}
-                data-modal-target="static-modal">
+              // onClick={() => addToUsersAlbums(album.mbid, album.title, album.artist)}
+              onClick={() => setModalOpen(true)}
+              data-modal-target="static-modal">
                   Add
               </button>
+            )}
 
             <div>
               <h4 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{album.title}</h4>
@@ -182,7 +194,11 @@ function AlbumInfo() {
             </div>
 
             {/* Rating modal  */}
-            {modalOpen && ( <RatingModal closeModal={closeModal}></RatingModal> )}
+            {modalOpen && ( <RatingModal 
+                              closeModal={closeModal}
+                              onSubmitRating={handleRating}>
+                            </RatingModal> 
+                          )}
 
           </div>
         </div>
