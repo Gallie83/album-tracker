@@ -11,7 +11,6 @@ const apiKey = import.meta.env.VITE_APP_API_KEY;
 // Interfaces
 interface Album {
   id: string,
-  hashId: string,
   title: string,
   artist: string,
   imageUrl: string 
@@ -40,18 +39,6 @@ function App() {
     fetchTags()
   }, [])
 
-  // Hash albums name+artist to use as ID, as mbid missing from majority of albums fetched
-  const generateId = (albumName: string, artistName: string) => {
-    const text = `${albumName.toLowerCase()}-${artistName.toLowerCase()}`;
-    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))
-    .then((hashBuffer) => {
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, "0")).join('');
-      console.log("HASHED HEX",hashHex)
-      return hashHex;
-    })
-  }
-
   useEffect(() => {
     // Make sure tags is populated 
     if(tags.length === 0) return
@@ -76,8 +63,6 @@ function App() {
           }) => ({
             // Generate random ID incase album appears in mulitple genres to prevent key errors
             id: uuidv4(),
-            // HashId to send as param to AlbumInfo page
-            hashId: generateId(release.name, release.artist.name),
             title: release.name,
             artist: release.artist.name,
             imageUrl: release.image?.find(img => img.size === "extralarge")?.["#text"] || "",
@@ -147,7 +132,7 @@ function App() {
               >
             {albums.map((album) => (
               <Link
-                to={`/album-info/${album.artist}/${album.title}/${album.hashId}`}
+                to={`/album-info/${album.artist}/${album.title}`}
                 className="bg-slate-500 px-3 py-2 mx-3 my-2 rounded-lg"
                 key={album.id}
               >

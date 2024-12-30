@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useCallback } from "react";
 import { useParams, Link } from "react-router-dom"
 import Navbar from "./Navbar/Navbar";
 import Searchbar from "./Searchbar";
@@ -26,8 +26,20 @@ function AlbumInfo() {
   const [modalOpen, setModalOpen] = useState(false);
 
   const { isAuthenticated } = useContext(AuthContext)!;
+
+  // Hash albums name+artist to use as ID, as mbid missing from majority of albums
+  const generateId = (albumName: string, artistName: string) => {
+    const text = `${albumName.toLowerCase()}-${artistName.toLowerCase()}`;
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))
+    .then((hashBuffer) => {
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, "0")).join('');
+      console.log("HASHED HEX",hashHex)
+      return hashHex;
+    })
+  }
   
-  const albumInfo = async (artist: string, album: string, hashId: string) => {
+  const albumInfo = useCallback(async (artist: string, album: string) => {
     try {
       const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=album.getInfo&api_key=${apiKey}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`);
       const data = await response.json()
@@ -38,8 +50,10 @@ function AlbumInfo() {
           ? data.album.tracks.track // It's an array
           : [data.album.tracks.track]; // Wrap single object in an array
       
+        const hashId = await generateId(album, artist);
+
         const fetchedAlbum: AlbumInfo = {
-          hashId: hashId,
+          hashId,
           title: album,
           artist: artist,
           imageUrl:
@@ -58,12 +72,12 @@ function AlbumInfo() {
     } catch(error) {
       console.error(error)
     }
-  } 
+  }, []);
 
   useEffect(() => {
-      if(params.artistName && params.albumName && params.albumHashId )
-      albumInfo(params.artistName, params.albumName, params.albumHashId)
-  }, [params])
+      if(params.artistName && params.albumName )
+      albumInfo(params.artistName, params.albumName)
+  }, [params, albumInfo])
 
   // Adds album to usersAlbums array
   const addToUsersAlbums = async (hashId: string, title: string, artist: string, rating: number | null) => {
