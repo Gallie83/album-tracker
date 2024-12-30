@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState, useRef } from 'react'
 import './App.css'
 import { Link } from 'react-router-dom';
@@ -12,7 +11,7 @@ const apiKey = import.meta.env.VITE_APP_API_KEY;
 // Interfaces
 interface Album {
   id: string,
-  mbid: string,
+  hashId: string,
   title: string,
   artist: string,
   imageUrl: string 
@@ -27,7 +26,6 @@ function App() {
   const [albumsByGenre, setAlbumsByGenre] = useState<AlbumsByGenre>({});
   const [tags, setTags] = useState<string[]>([])
 
-  // const carouselRef = useRef({})
   const carouselRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
@@ -37,11 +35,22 @@ function App() {
       const data = await response.json()   
       const names = data.toptags.tag.map((tag: {name: string}) => tag.name);
       setTags(names)
-      console.log("TAGS", tags)
     }
 
     fetchTags()
   }, [])
+
+  // Hash albums name+artist to use as ID, as mbid missing from majority of albums fetched
+  const generateId = (albumName: string, artistName: string) => {
+    const text = `${albumName.toLowerCase()}-${artistName.toLowerCase()}`;
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))
+    .then((hashBuffer) => {
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, "0")).join('');
+      console.log("HASHED HEX",hashHex)
+      return hashHex;
+    })
+  }
 
   useEffect(() => {
     // Make sure tags is populated 
@@ -55,22 +64,20 @@ function App() {
           `https://ws.audioscrobbler.com/2.0/?method=tag.gettopalbums&tag=${tag}&api_key=${apiKey}&format=json`
         );
         const data = await response.json();
-        console.log("DATA", data)
         
         // Check if data.albums and data.albums.album exist and are arrays
         if (data.albums && Array.isArray(data.albums.album)) {
         // Set data for the genre
         return {
           [tag]: data.albums.album.map((release: {
-            mbid: string,
             name: string;
             artist: { name: string };
             image: { "#text": string; size: string }[];
           }) => ({
-            // Generate ID incase album appears in mulitple genres to prevent key errors
+            // Generate random ID incase album appears in mulitple genres to prevent key errors
             id: uuidv4(),
-            // Mbid to send as param to AlbumInfo page
-            mbid: release.mbid,
+            // HashId to send as param to AlbumInfo page
+            hashId: generateId(release.name, release.artist.name),
             title: release.name,
             artist: release.artist.name,
             imageUrl: release.image?.find(img => img.size === "extralarge")?.["#text"] || "",
@@ -105,8 +112,6 @@ function App() {
         left: direction === 'next' ? scrollAmount : -scrollAmount,
         behavior: "smooth",
       })
-    } else {
-      console.log("No carousel")
     }
   }
 
@@ -142,7 +147,7 @@ function App() {
               >
             {albums.map((album) => (
               <Link
-                to={`/album-info/${album.artist}/${album.title}/${album.mbid}`}
+                to={`/album-info/${album.artist}/${album.title}/${album.hashId}`}
                 className="bg-slate-500 px-3 py-2 mx-3 my-2 rounded-lg"
                 key={album.id}
               >

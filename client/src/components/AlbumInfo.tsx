@@ -8,7 +8,7 @@ import { AuthContext } from "../contexts/AuthContext";
 const apiKey = import.meta.env.VITE_APP_API_KEY;
 
 interface AlbumInfo {
-    mbid: string,
+    hashId: string,
     title: string,
     artist: string,
     imageUrl: string,
@@ -20,14 +20,14 @@ interface AlbumInfo {
 }
 
 function AlbumInfo() {
-  const params = useParams<{artistName:string , albumName: string, albumMbid: string}>();
+  const params = useParams<{artistName:string , albumName: string, albumHashId: string}>();
   const [album, setAlbum] = useState<AlbumInfo>();
   const [open, setOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
   const { isAuthenticated } = useContext(AuthContext)!;
   
-  const albumInfo = async (artist: string, album: string, mbid: string) => {
+  const albumInfo = async (artist: string, album: string, hashId: string) => {
     try {
       const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=album.getInfo&api_key=${apiKey}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`);
       const data = await response.json()
@@ -39,7 +39,7 @@ function AlbumInfo() {
           : [data.album.tracks.track]; // Wrap single object in an array
       
         const fetchedAlbum: AlbumInfo = {
-          mbid: mbid,
+          hashId: hashId,
           title: album,
           artist: artist,
           imageUrl:
@@ -61,14 +61,14 @@ function AlbumInfo() {
   } 
 
   useEffect(() => {
-      if(params.artistName && params.albumName && params.albumMbid )
-      albumInfo(params.artistName, params.albumName, params.albumMbid)
+      if(params.artistName && params.albumName && params.albumHashId )
+      albumInfo(params.artistName, params.albumName, params.albumHashId)
   }, [params])
 
   // Adds album to usersAlbums array
-  const addToUsersAlbums = async (mbid: string, title: string, artist: string, rating: number | null) => {
+  const addToUsersAlbums = async (hashId: string, title: string, artist: string, rating: number | null) => {
     try {
-      const albumData = {albumId: mbid, title, artist, rating};
+      const albumData = {albumId: hashId, title, artist, rating};
       console.log(albumData)
 
       const response = await fetch(`http://localhost:5000/rate-album`, {
@@ -95,7 +95,7 @@ function AlbumInfo() {
   const handleRating = (rating: number | null) => {
     console.log("Value received:", rating)
     if(album) {
-      addToUsersAlbums(album.mbid, album.title, album.artist, rating);
+      addToUsersAlbums(album.hashId, album.title, album.artist, rating);
       closeModal();
     }
   }
@@ -115,7 +115,7 @@ function AlbumInfo() {
       {album ? (
         // Outer div
         <div className="flex items-center justify-center h-screen">
-          <div key={album.mbid} className="flex w-11/12 items-stretch bg-pink-300 border border-gray-200 rounded-lg md:flex-row p-5">
+          <div key={album.hashId} className="flex w-11/12 items-stretch bg-pink-300 border border-gray-200 rounded-lg md:flex-row p-5">
             {/* Left Section with Image and Track List */}
             <div className="flex flex-col w-2/5 p-2 bg-slate-600">
               <img
