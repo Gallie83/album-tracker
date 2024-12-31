@@ -61,7 +61,7 @@ function RatingModal( {onSubmitRating, closeModal}: { onSubmitRating: (rating: n
                         }`}
                         onMouseEnter={() => setHoverIndex(index)}
                         onMouseLeave={() => setHoverIndex(-1)} // Reset hover index when not hovering
-                        onClick={() => setValueIndex(hoverIndex)}
+                        onClick={() => setValueIndex(index + 1)}
                     >
                         <img src={VinylImage} alt="Vinyl" className="w-8 h-8" />
                     </div>
