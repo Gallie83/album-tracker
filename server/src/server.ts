@@ -236,20 +236,21 @@ app.post('/rate-album', checkAuth, async (req,res): Promise<void> => {
         // Check if user already has album in usersAlbums
         let album = user.usersAlbums.find(album => album.id === albumId);
 
-        // If not then add it
-        if(!album) {
-            user.usersAlbums.push({
-                id: albumId, 
-                title,
-                artist,
-                dateListened: new Date(),
-                // Set rating as null incase user doesn't want to add a rating
-                rating: null,
-            });
-        } else if( rating !== undefined) {
-            // Add rating if user has included it
-            album.rating = rating;
+        if (album) {
+            // Return message if album already exists
+            res.status(200).json({ message: 'This album is already in your list.' });
+            return;
         }
+
+        // If album is not found, add it to the user's list
+        user.usersAlbums.push({
+            id: albumId,
+            title,
+            artist,
+            dateListened: new Date(),
+            // Set rating as null in case user doesn't want to add a rating
+            rating: rating !== undefined ? rating : null,
+        });
 
         await user.save();
         res.status(200).json({

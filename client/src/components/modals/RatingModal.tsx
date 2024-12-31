@@ -9,11 +9,15 @@ function RatingModal( {onSubmitRating, closeModal}: { onSubmitRating: (rating: n
 
   // Pass rating back to AlbumInfo
   const handleSubmit = () => {
-    onSubmitRating(valueIndex)
+    if(!valueIndex) {
+      alert("You have not selected a rating value")
+      return
+    }
+    onSubmitRating(valueIndex+1)
   }
 
   useEffect(() => {
-    console.log("VALUE:",valueIndex)
+    console.log("VALUE:",(valueIndex))
   }, [valueIndex])
 
   // Pass null as rating for AlbumInfo
@@ -61,7 +65,7 @@ function RatingModal( {onSubmitRating, closeModal}: { onSubmitRating: (rating: n
                         }`}
                         onMouseEnter={() => setHoverIndex(index)}
                         onMouseLeave={() => setHoverIndex(-1)} // Reset hover index when not hovering
-                        onClick={() => setValueIndex(index + 1)}
+                        onClick={() => setValueIndex(index)}
                     >
                         <img src={VinylImage} alt="Vinyl" className="w-8 h-8" />
                     </div>

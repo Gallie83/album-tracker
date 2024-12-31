@@ -99,6 +99,12 @@ function AlbumInfo() {
       }
 
       const data = await response.json();
+
+      // TODO: Add a modal that gives the user the option to view list/update current rating entry
+      if(data.message === "This album is already in your list.") {
+        alert("This album is already in your list. Album not saved.")
+      }
+
       console.log('Data:', data)
     } catch (error) {
       console.error('Error adding album to list:', error)
