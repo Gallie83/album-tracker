@@ -85,7 +85,10 @@ function AlbumInfo() {
       const albumData = {albumId: hashId, title, artist, rating};
       console.log(albumData)
 
-      const response = await fetch(`http://localhost:5000/rate-album`, {
+      // If the rating is 0 then it will call the save route
+      const method = rating === 0 ? "save" : "rate";
+
+      const response = await fetch(`http://localhost:5000/${method}-album`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -191,11 +194,20 @@ function AlbumInfo() {
 
             {/* If user is logged in, button opens RatingModal */}
             { isAuthenticated && (
+              <>
               <button 
               onClick={() => setModalOpen(true)}
               data-modal-target="static-modal">
                   Add
               </button>
+              <br />
+              {/* Button to save album */}
+              <button 
+              onClick={() => addToUsersAlbums(album.hashId, album.title, album.artist, 0)}
+              data-modal-target="static-modal">
+                  Save
+              </button>
+                </>
             )}
 
             <div>
