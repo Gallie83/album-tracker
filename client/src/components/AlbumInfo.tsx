@@ -79,16 +79,14 @@ function AlbumInfo() {
       albumInfo(params.artistName, params.albumName)
   }, [params, albumInfo])
 
-  // Adds album to usersAlbums array
+  // Adds album to usersAlbums/usersSavedAlbums array
+  // TODO: Allow user to create their own lists with custom names
   const addToUsersAlbums = async (hashId: string, title: string, artist: string, rating: number | null) => {
     try {
       const albumData = {albumId: hashId, title, artist, rating};
       console.log(albumData)
 
-      // If the rating is 0 then it will call the save route
-      const method = rating === 0 ? "save" : "rate";
-
-      const response = await fetch(`http://localhost:5000/${method}-album`, {
+      const response = await fetch(`http://localhost:5000/save-album`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -201,7 +199,7 @@ function AlbumInfo() {
                   Add
               </button>
               <br />
-              {/* Button to save album */}
+              {/* Button to save album, set rating as 0 to save to usersSavedAlbums */}
               <button 
               onClick={() => addToUsersAlbums(album.hashId, album.title, album.artist, 0)}
               data-modal-target="static-modal">
