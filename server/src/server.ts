@@ -263,6 +263,57 @@ app.post('/rate-album', checkAuth, async (req,res): Promise<void> => {
     }
 });
 
+// Save album Route
+app.post('/save-album', checkAuth, async (req,res): Promise<void> => {
+    const typedReq = req as AuthenticatedRequest;
+
+    const { albumId, title, artist } = typedReq.body;
+    
+    try {
+        // Ensure user is authenticated
+        if(!typedReq.session.userInfo) { 
+            res.status(401).json({error: 'User not authenticated'})
+            return 
+        }
+
+        // Set cognitoId and then search for user
+        const cognitoId = typedReq.session.userInfo.sub
+
+        const user = await User.findOne({ cognitoId });
+
+        if(!user) {
+            res.status(404).json({ message: 'Cannot find user' });
+            return 
+        }
+
+        // Check if user already has album in usersAlbums
+        let album = user.usersSavedAlbums.find(album => album.id === albumId);
+
+        if (album) {
+            // Return message if album already exists
+            res.status(200).json({ message: 'This album is already in your saved albums.' });
+            return;
+        }
+
+        // If album is not found, add it to the user's saved list
+        user.usersSavedAlbums.push({
+            id: albumId,
+            title,
+            artist,
+            dateListened: new Date(),
+        });
+
+        await user.save();
+        res.status(200).json({
+            message: 'Album saved',
+            album
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 // MongoDB connection setup
 mongoose.connect(uri)
 .then(() => console.log("Connected to DB"))

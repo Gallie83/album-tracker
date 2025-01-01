@@ -39,7 +39,7 @@ const UserSchema = new mongoose.Schema({
             }
         }
     ],
-    userSavedAlbums: [
+    usersSavedAlbums: [
         {
             title: {
                 type: String,
