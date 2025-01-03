@@ -14,6 +14,7 @@ function Profile() {
     const { isAuthenticated, username, email, logout} = useContext(AuthContext)!;
 
     const [usersAlbums, setUsersAlbums] = useState<Album[] | null>(null);
+    const [savedAlbums, setSavedAlbums] = useState<Album[] | null>(null);
 
     console.log("USER:", isAuthenticated, username, email )
 
@@ -24,9 +25,11 @@ function Profile() {
                 const response = await fetch('http://localhost:5000/user-albums', {
                     credentials: 'include'
                 });
-                const data: { usersAlbums: Album[] } = await response.json();
+                const data: { usersAlbums: Album[], savedAlbums: Album[] } = await response.json();
+                console.log("DATA:",data)
                 console.log("User albums",data.usersAlbums)
                 setUsersAlbums(data.usersAlbums);
+                setSavedAlbums(data.savedAlbums);
             } catch (error) {
                 console.log(error)
             }
@@ -85,6 +88,20 @@ function Profile() {
                             )) 
                         ) : ( 
                             <p>No albums yet</p> 
+                            )}
+                    </div>
+                    <div>
+                        {/* Condionally render users albums */}
+                        Saved albums: {savedAlbums ? ( 
+                            savedAlbums.map((album, index) => (
+                            <p 
+                                // Ensure key is unique
+                                key={`${album.mbid}-${index}`}>
+                                    <b>{album.title}</b> - {album.artist}
+                            </p>
+                            )) 
+                        ) : ( 
+                            <p>No albums saved yet</p> 
                             )}
                     </div>
                     <button onClick={handleLogout}>Logout</button>

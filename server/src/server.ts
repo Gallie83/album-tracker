@@ -180,7 +180,7 @@ app.get('/logout', (req, res) => {
     res.redirect(logoutUrl);
 });
 
-// Route for getting usersAlbums
+// Route for getting usersAlbums + usersSavedAlbums
 app.get('/user-albums', checkAuth, async (req,res) => {
     const typedReq = req as AuthenticatedRequest;
     try {   
@@ -191,11 +191,7 @@ app.get('/user-albums', checkAuth, async (req,res) => {
             return 
         }
 
-        console.log('Session:', typedReq.session);
-        console.log('User Info:', typedReq.session?.userInfo);
-
         const cognitoId = typedReq.session.userInfo.sub;
-        
         const user = await User.findOne({cognitoId});
         
         if(!user) {
@@ -203,8 +199,7 @@ app.get('/user-albums', checkAuth, async (req,res) => {
             return 
         }
 
-        res.json({usersAlbums: user.usersAlbums})
-        console.log(user.usersAlbums)
+        res.json({usersAlbums: user.usersAlbums, savedAlbums: user.usersSavedAlbums})
     } catch (error) {
         console.log("USERS ALBUMS ERROR:",error);
     }
@@ -262,7 +257,7 @@ app.post('/save-album', checkAuth, async (req,res): Promise<void> => {
 
         await user.save();
         res.status(200).json({
-            message: 'Album added to MyAlbums',
+            message: rating === 0 ? 'Album saved' : 'Album added to Your Albums',
             album
         });
     } catch (err) {
