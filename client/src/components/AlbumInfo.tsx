@@ -77,7 +77,7 @@ function AlbumInfo() {
           })),
           description: data.album.wiki?.content || "No description available.",
           url: data.album.url,
-          isSaved
+          isSaved,
         };
         setAlbum(fetchedAlbum);
       }  
@@ -125,6 +125,26 @@ function AlbumInfo() {
     }
   }
 
+  const removeAlbum = async (albumId:string, rating: number | null) => {
+    try {    
+      const response = await fetch('http://localhost/remove-album', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({albumId, rating})
+        });
+
+      if(!response.ok) {
+        throw new Error(`Error: ${response.status}`)
+      }
+      
+    } catch (error) {
+      console.error("Error removing album:",error)
+    }
+  }
+
   // Receives rating from RatingModal(or as null if user decided to skip)
   const handleRating = (rating: number | null) => {
     console.log("Value received:", rating)
@@ -133,8 +153,6 @@ function AlbumInfo() {
       closeModal();
     }
   }
-
-
 
   const closeModal = () => {
     setModalOpen(false)
@@ -221,6 +239,9 @@ function AlbumInfo() {
                   {/* Bookmark Icon */}
                 <FontAwesomeIcon icon={faBookmark} color={album.isSaved ? 'black' : 'white'}/>
               </button>
+              {album.isSaved && (
+                <button onClick={() => removeAlbum(album.hashId, 0)}>Remove</button>
+              )}
                 </>
             )}
 

@@ -291,9 +291,9 @@ app.delete('/remove-album', checkAuth, async (req,res) => {
 
         // Check which list to remove item from and then save user 
         if(rating === 0) {
-            user.usersSavedAlbums.filter((album) => album.id !== albumId);
+            user.usersSavedAlbums.pull({id: albumId});
         } else {
-            user.usersAlbums.filter((album) => album.id !== albumId);
+            user.usersAlbums.pull({id: albumId});
         }
         await user.save()
         
