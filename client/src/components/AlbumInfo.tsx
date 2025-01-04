@@ -4,6 +4,7 @@ import Navbar from "./Navbar/Navbar";
 import Searchbar from "./Searchbar";
 import RatingModal from "./modals/RatingModal";
 import { useAuth } from "../contexts/AuthContext/useAuth";
+import { useAlbumContext } from "../contexts/AlbumContext/useAlbumContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookmark } from '@fortawesome/free-solid-svg-icons';
 
@@ -18,7 +19,8 @@ interface AlbumInfo {
         name: string,
     }[], 
     description: string,
-    url: string 
+    url: string,
+    isSaved: boolean
 }
 
 function AlbumInfo() {
@@ -28,6 +30,7 @@ function AlbumInfo() {
   const [modalOpen, setModalOpen] = useState(false);
 
   const { isAuthenticated } = useAuth();
+  const { savedAlbums } = useAlbumContext();
 
   // Hash albums name+artist to use as ID, as mbid missing from majority of albums
   const generateId = (albumName: string, artistName: string) => {
@@ -40,6 +43,11 @@ function AlbumInfo() {
       return hashHex;
     })
   }
+
+  // Check if album is already in usersSavedAlbums
+  const isAlbumSaved = (id: string) => {
+    return savedAlbums?.some(album => album.id === id) || false
+  } 
   
   const albumInfo = useCallback(async (artist: string, album: string) => {
     try {
@@ -53,6 +61,8 @@ function AlbumInfo() {
           : [data.album.tracks.track]; // Wrap single object in an array
       
         const hashId = await generateId(album, artist);
+
+        const isSaved = await isAlbumSaved(hashId);
 
         const fetchedAlbum: AlbumInfo = {
           hashId,
@@ -68,6 +78,7 @@ function AlbumInfo() {
           })),
           description: data.album.wiki?.content || "No description available.",
           url: data.album.url,
+          isSaved
         };
         setAlbum(fetchedAlbum);
       }  
@@ -77,8 +88,9 @@ function AlbumInfo() {
   }, []);
 
   useEffect(() => {
-      if(params.artistName && params.albumName )
-      albumInfo(params.artistName, params.albumName)
+      if(params.artistName && params.albumName) {
+        albumInfo(params.artistName, params.albumName)
+      }
   }, [params, albumInfo])
 
   // Adds album to usersAlbums/usersSavedAlbums array
@@ -206,7 +218,7 @@ function AlbumInfo() {
                 onClick={() => addToUsersAlbums(album.hashId, album.title, album.artist, 0)}
                 data-modal-target="static-modal">
                   {/* Bookmark Icon */}
-                <FontAwesomeIcon icon={faBookmark} color="black"/>
+                <FontAwesomeIcon icon={faBookmark} color={album.isSaved ? 'black' : 'white'}/>
               </button>
                 </>
             )}

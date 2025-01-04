@@ -4,6 +4,7 @@ import { AuthContext } from "../AuthContext/AuthContext";
 interface Album {
   title: string;
   artist: string;
+  id: string,
   rating?: number | null;
 }
 

@@ -1,45 +1,15 @@
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 import Navbar from "./Navbar/Navbar";
 import Searchbar from "./Searchbar";
 import { useAuth } from "../contexts/AuthContext/useAuth";
-
-interface Album {
-    mbid: string,
-    title: string,
-    artist: string
-}
+import { useAlbumContext } from "../contexts/AlbumContext/useAlbumContext";
 
 function Profile() {
 
     const { isAuthenticated, username, email, logout} = useAuth();
-
-    const [usersAlbums, setUsersAlbums] = useState<Album[] | null>(null);
-    const [savedAlbums, setSavedAlbums] = useState<Album[] | null>(null);
+    const { usersAlbums, savedAlbums } = useAlbumContext();
 
     console.log("USER:", isAuthenticated, username, email )
-
-    useEffect(() => {
-        // Fetch all albums in usersAlbums
-        const getUsersAlbums = async () => {
-            try {
-                const response = await fetch('http://localhost:5000/user-albums', {
-                    credentials: 'include'
-                });
-                const data: { usersAlbums: Album[], savedAlbums: Album[] } = await response.json();
-                console.log("DATA:",data)
-                console.log("User albums",data.usersAlbums)
-                setUsersAlbums(data.usersAlbums);
-                setSavedAlbums(data.savedAlbums);
-            } catch (error) {
-                console.log(error)
-            }
-        }
-
-        // Only fetch is user is logged in
-        if(isAuthenticated) {
-            getUsersAlbums();
-        }
-    }, [isAuthenticated])
 
     const handleLogin = async () => {
         try {
@@ -82,7 +52,7 @@ function Profile() {
                             usersAlbums.map((album, index) => (
                             <p 
                                 // Ensure key is unique
-                                key={`${album.mbid}-${index}`}>
+                                key={`${index}`}>
                                     <b>{album.title}</b> - {album.artist}
                             </p>
                             )) 
@@ -96,7 +66,7 @@ function Profile() {
                             savedAlbums.map((album, index) => (
                             <p 
                                 // Ensure key is unique
-                                key={`${album.mbid}-${index}`}>
+                                key={`${index}`}>
                                     <b>{album.title}</b> - {album.artist}
                             </p>
                             )) 

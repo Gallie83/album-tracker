@@ -8,6 +8,7 @@ import ArtistInfo from './components/ArtistInfo.tsx';
 import SearchPage from './components/SearchPage.tsx';
 import Profile from './components/Profile.tsx'
 import { AuthProvider } from './contexts/AuthContext/AuthContext.tsx';
+import { AlbumProvider } from './contexts/AlbumContext/AlbumContext.tsx';
 
 const router = createBrowserRouter([
   {
@@ -35,8 +36,10 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthProvider>
-    <RouterProvider router={router} />
-  </AuthProvider>
+      <AlbumProvider>
+        <RouterProvider router={router} />
+      </AlbumProvider>
+    </AuthProvider>
   </StrictMode>,
 )
  
