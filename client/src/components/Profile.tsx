@@ -1,7 +1,7 @@
-import { useContext, useEffect, useState } from "react";
-import Navbar from "./Navbar/Navbar"
-import Searchbar from "./Searchbar"
-import { AuthContext } from "../contexts/AuthContext/AuthContext";
+import { useEffect, useState } from "react";
+import Navbar from "./Navbar/Navbar";
+import Searchbar from "./Searchbar";
+import { useAuth } from "../contexts/AuthContext/useAuth";
 
 interface Album {
     mbid: string,
@@ -11,7 +11,7 @@ interface Album {
 
 function Profile() {
 
-    const { isAuthenticated, username, email, logout} = useContext(AuthContext)!;
+    const { isAuthenticated, username, email, logout} = useAuth();
 
     const [usersAlbums, setUsersAlbums] = useState<Album[] | null>(null);
     const [savedAlbums, setSavedAlbums] = useState<Album[] | null>(null);

@@ -1,9 +1,9 @@
-import { useEffect, useState, useContext, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom"
 import Navbar from "./Navbar/Navbar";
 import Searchbar from "./Searchbar";
 import RatingModal from "./modals/RatingModal";
-import { AuthContext } from "../contexts/AuthContext/AuthContext";
+import { useAuth } from "../contexts/AuthContext/useAuth";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookmark } from '@fortawesome/free-solid-svg-icons';
 
@@ -27,7 +27,7 @@ function AlbumInfo() {
   const [open, setOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
-  const { isAuthenticated } = useContext(AuthContext)!;
+  const { isAuthenticated } = useAuth();
 
   // Hash albums name+artist to use as ID, as mbid missing from majority of albums
   const generateId = (albumName: string, artistName: string) => {

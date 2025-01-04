@@ -1,12 +1,12 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import VinylImage from './vinyl-image.png';
 import { Link } from 'react-router-dom';
-import { AuthContext } from '../../contexts/AuthContext/AuthContext';
+import { useAuth } from '../../contexts/AuthContext/useAuth';
 
 function Navbar() {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
 
-  const {isAuthenticated, username, logout} = useContext(AuthContext)!;
+  const {isAuthenticated, username, logout} = useAuth();
 
   const handleLogin = async () => {
     try {
