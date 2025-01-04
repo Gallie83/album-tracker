@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import Navbar from "./Navbar/Navbar"
 import Searchbar from "./Searchbar"
-import { AuthContext } from "../contexts/AuthContext";
+import { AuthContext } from "../contexts/AuthContext/AuthContext";
 
 interface Album {
     mbid: string,

@@ -3,7 +3,9 @@ import { useParams, Link } from "react-router-dom"
 import Navbar from "./Navbar/Navbar";
 import Searchbar from "./Searchbar";
 import RatingModal from "./modals/RatingModal";
-import { AuthContext } from "../contexts/AuthContext";
+import { AuthContext } from "../contexts/AuthContext/AuthContext";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBookmark } from '@fortawesome/free-solid-svg-icons';
 
 const apiKey = import.meta.env.VITE_APP_API_KEY;
 
@@ -201,9 +203,10 @@ function AlbumInfo() {
               <br />
               {/* Button to save album, set rating as 0 to save to usersSavedAlbums */}
               <button 
-              onClick={() => addToUsersAlbums(album.hashId, album.title, album.artist, 0)}
-              data-modal-target="static-modal">
-                  Save
+                onClick={() => addToUsersAlbums(album.hashId, album.title, album.artist, 0)}
+                data-modal-target="static-modal">
+                  {/* Bookmark Icon */}
+                <FontAwesomeIcon icon={faBookmark} color="black"/>
               </button>
                 </>
             )}

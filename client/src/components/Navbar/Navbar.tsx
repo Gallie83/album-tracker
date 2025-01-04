@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import VinylImage from './vinyl-image.png';
 import { Link } from 'react-router-dom';
-import { AuthContext } from '../../contexts/AuthContext';
+import { AuthContext } from '../../contexts/AuthContext/AuthContext';
 
 function Navbar() {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);

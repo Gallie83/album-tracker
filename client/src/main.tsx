@@ -7,7 +7,7 @@ import AlbumInfo from './components/AlbumInfo.tsx';
 import ArtistInfo from './components/ArtistInfo.tsx';
 import SearchPage from './components/SearchPage.tsx';
 import Profile from './components/Profile.tsx'
-import { AuthProvider } from './contexts/AuthContext.tsx';
+import { AuthProvider } from './contexts/AuthContext/AuthContext.tsx';
 
 const router = createBrowserRouter([
   {
