@@ -39,7 +39,6 @@ function AlbumInfo() {
     .then((hashBuffer) => {
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, "0")).join('');
-      console.log("HASHED HEX",hashHex)
       return hashHex;
     })
   }
@@ -62,7 +61,7 @@ function AlbumInfo() {
       
         const hashId = await generateId(album, artist);
 
-        const isSaved = await isAlbumSaved(hashId);
+        const isSaved = isAlbumSaved(hashId);
 
         const fetchedAlbum: AlbumInfo = {
           hashId,
@@ -134,6 +133,8 @@ function AlbumInfo() {
       closeModal();
     }
   }
+
+
 
   const closeModal = () => {
     setModalOpen(false)

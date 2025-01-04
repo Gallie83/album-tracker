@@ -266,6 +266,42 @@ app.post('/save-album', checkAuth, async (req,res): Promise<void> => {
     }
 });
 
+// Route to remove an album from a list
+app.delete('/remove-album', checkAuth, async (req,res) => {
+    const typedReq = req as AuthenticatedRequest;
+
+    const { albumId, rating } = typedReq.body;
+    
+    try {
+        // Ensure user is authenticated
+        if(!typedReq.session.userInfo) { 
+            res.status(401).json({error: 'User not authenticated'})
+            return 
+        }
+
+        // Set cognitoId and then search for user
+        const cognitoId = typedReq.session.userInfo.sub
+
+        const user = await User.findOne({ cognitoId });
+
+        if(!user) {
+            res.status(404).json({ message: 'Cannot find user' });
+            return 
+        }
+
+        // Check which list to remove item from and then save user 
+        if(rating === 0) {
+            user.usersSavedAlbums.filter((album) => album.id !== albumId);
+        } else {
+            user.usersAlbums.filter((album) => album.id !== albumId);
+        }
+        await user.save()
+        
+    } catch {
+        console.log("error")
+    }
+})
+
 // MongoDB connection setup
 mongoose.connect(uri)
 .then(() => console.log("Connected to DB"))
