@@ -19,15 +19,15 @@ interface AlbumInfo {
         name: string,
     }[], 
     description: string,
-    url: string,
-    isSaved: boolean
-}
+    url: string
+  }
 
 function AlbumInfo() {
   const params = useParams<{artistName:string , albumName: string, albumHashId: string}>();
   const [album, setAlbum] = useState<AlbumInfo>();
   const [open, setOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [isSaved, setIsSaved] = useState<boolean>(false)
 
   const { isAuthenticated } = useAuth();
   const { savedAlbums } = useAlbumContext();
@@ -45,7 +45,9 @@ function AlbumInfo() {
 
   // Check if album is already in usersSavedAlbums
   const isAlbumSaved = (id: string) => {
-    return savedAlbums?.some(album => album.id === id) || false
+    if(savedAlbums?.some(album => album.id === id)) {
+      setIsSaved(true)
+    } 
   } 
   
   const albumInfo = useCallback(async (artist: string, album: string) => {
@@ -61,7 +63,7 @@ function AlbumInfo() {
       
         const hashId = await generateId(album, artist);
 
-        const isSaved = isAlbumSaved(hashId);
+        isAlbumSaved(hashId);
 
         const fetchedAlbum: AlbumInfo = {
           hashId,
@@ -76,8 +78,7 @@ function AlbumInfo() {
             rank: track.rank,
           })),
           description: data.album.wiki?.content || "No description available.",
-          url: data.album.url,
-          isSaved,
+          url: data.album.url
         };
         setAlbum(fetchedAlbum);
       }  
@@ -141,10 +142,6 @@ function AlbumInfo() {
       if(!response.ok) {
         throw new Error(`Error: ${response.status}`)
       }
-
-      console.log("delete response:", response)
-
-      console.log("Success deleted")
       
     } catch (error) {
       console.error("Error removing album:",error)
@@ -162,6 +159,15 @@ function AlbumInfo() {
 
   const closeModal = () => {
     setModalOpen(false)
+  }
+
+  const toggleBookmarkFunction = async (id:string, title:string, artist:string , rating: number) => {
+    if(isSaved) {
+      await removeAlbum(id, 0)
+    } else {
+      await addToUsersAlbums(id, title, artist, rating)
+    }
+    setIsSaved(!isSaved);
   }
       
   return(
@@ -238,16 +244,12 @@ function AlbumInfo() {
                   Add
               </button>
               <br />
-              {/* Button to save album, set rating as 0 to save to usersSavedAlbums */}
-              <button 
-                onClick={() => addToUsersAlbums(album.hashId, album.title, album.artist, 0)}
-                data-modal-target="static-modal">
-                  {/* Bookmark Icon */}
-                <FontAwesomeIcon icon={faBookmark} color={album.isSaved ? 'black' : 'white'}/>
-              </button>
-              {album.isSaved && (
-                <button onClick={() => removeAlbum(album.hashId, 0)}>Remove</button>
-              )}
+              {/* Bookmark Icon */}
+
+                <FontAwesomeIcon 
+                  onClick={() => toggleBookmarkFunction(album.hashId, album.title, album.artist, 0)} 
+                  icon={faBookmark} 
+                  color={ isSaved ? 'black' : 'white'} />
                 </>
             )}
 
