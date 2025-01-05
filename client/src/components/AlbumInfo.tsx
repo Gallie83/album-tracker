@@ -56,7 +56,7 @@ function AlbumInfo() {
       setModalOpen(true)
     } else {
       // Redirect to login
-      const returnUrl = window.location.pathname || '/';
+      const returnUrl = window.location.pathname;
       window.location.replace(`http://localhost:5000/login?returnUrl=${returnUrl}`);
     }
   }
@@ -183,7 +183,7 @@ function AlbumInfo() {
         setIsSaved(!isSaved);
     } else {
       // Redirect to login
-      const returnUrl = window.location.pathname || '/';
+      const returnUrl = window.location.pathname;
       window.location.replace(`http://localhost:5000/login?returnUrl=${returnUrl}`);
     }
   }
