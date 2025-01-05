@@ -49,6 +49,17 @@ function AlbumInfo() {
       setIsSaved(true)
     } 
   } 
+
+  const openRatingModal = () => {
+    // Open modal if logged in
+    if(isAuthenticated) {
+      setModalOpen(true)
+    } else {
+      // Redirect to login
+      const returnUrl = window.location.pathname || '/';
+      window.location.replace(`http://localhost:5000/login?returnUrl=${returnUrl}`);
+    }
+  }
   
   const albumInfo = useCallback(async (artist: string, album: string) => {
     try {
@@ -162,12 +173,19 @@ function AlbumInfo() {
   }
 
   const toggleBookmarkFunction = async (id:string, title:string, artist:string , rating: number) => {
-    if(isSaved) {
-      await removeAlbum(id, 0)
+    // Save if logged in
+    if(isAuthenticated) {
+        if(isSaved) {
+          await removeAlbum(id, 0)
+        } else {
+          await addToUsersAlbums(id, title, artist, rating)
+        }
+        setIsSaved(!isSaved);
     } else {
-      await addToUsersAlbums(id, title, artist, rating)
+      // Redirect to login
+      const returnUrl = window.location.pathname || '/';
+      window.location.replace(`http://localhost:5000/login?returnUrl=${returnUrl}`);
     }
-    setIsSaved(!isSaved);
   }
       
   return(
@@ -235,23 +253,21 @@ function AlbumInfo() {
             {/* Right Section with Summary */}
             <div className="w-3/5 bg-green-300 flex flex-col justify-between p-6 px-16 leading-normal">
 
-            {/* If user is logged in, button opens RatingModal */}
-            { isAuthenticated && (
+            {/* Opens RatingModal */}
               <>
               <button 
-              onClick={() => setModalOpen(true)}
+              onClick={() => openRatingModal()}
               data-modal-target="static-modal">
                   Add
               </button>
               <br />
-              {/* Bookmark Icon */}
 
+              {/* Bookmark Icon */}
                 <FontAwesomeIcon 
                   onClick={() => toggleBookmarkFunction(album.hashId, album.title, album.artist, 0)} 
                   icon={faBookmark} 
                   color={ isSaved ? 'black' : 'white'} />
                 </>
-            )}
 
             <div>
               <h4 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{album.title}</h4>
