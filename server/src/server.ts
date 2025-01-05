@@ -292,13 +292,17 @@ app.delete('/remove-album', checkAuth, async (req,res) => {
         // Check which list to remove item from and then save user 
         if(rating === 0) {
             user.usersSavedAlbums.pull({id: albumId});
+            console.log("SAVEDALBUMS:", user.usersSavedAlbums)
         } else {
             user.usersAlbums.pull({id: albumId});
         }
         await user.save()
+
+        res.status(200).json({message: 'Album deleted'})
         
     } catch {
         console.log("error")
+        res.status(500).json({message: 'Failure deleting'})
     }
 })
 

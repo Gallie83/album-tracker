@@ -126,8 +126,10 @@ function AlbumInfo() {
   }
 
   const removeAlbum = async (albumId:string, rating: number | null) => {
+    console.log("Deleting...")
+    console.log("SAVED ALBUMS:",savedAlbums)
     try {    
-      const response = await fetch('http://localhost/remove-album', {
+      const response = await fetch('http://localhost:5000/remove-album', {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json'
@@ -139,6 +141,10 @@ function AlbumInfo() {
       if(!response.ok) {
         throw new Error(`Error: ${response.status}`)
       }
+
+      console.log("delete response:", response)
+
+      console.log("Success deleted")
       
     } catch (error) {
       console.error("Error removing album:",error)
