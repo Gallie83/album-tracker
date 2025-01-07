@@ -30,7 +30,7 @@ function AlbumInfo() {
   const [isSaved, setIsSaved] = useState<boolean>(false)
 
   const { isAuthenticated } = useAuth();
-  const { savedAlbums } = useAlbumContext();
+  const { savedAlbums, usersAlbums } = useAlbumContext();
 
   // Hash albums name+artist to use as ID, as mbid missing from majority of albums
   const generateId = (albumName: string, artistName: string) => {
@@ -43,9 +43,14 @@ function AlbumInfo() {
     })
   }
 
-  const openRatingModal = () => {
-    // Open modal if logged in
+  const openRatingModal = (hashId: string) => {
+    // Check Authentication
     if(isAuthenticated) {
+      // Check if album is already in list
+      if(usersAlbums!.some(album => album.id === hashId)) {
+        alert("This album is already in your list. Album not saved.") 
+        return;
+      }
       setModalOpen(true)
     } else {
       // Redirect to login
@@ -68,9 +73,9 @@ function AlbumInfo() {
         const hashId = await generateId(album, artist);
 
         // Check if album is already in usersSavedAlbums
-          if(savedAlbums?.some(album => album.id === hashId)) {
-            setIsSaved(true)
-          } 
+        if(savedAlbums?.some(album => album.id === hashId)) {
+          setIsSaved(true)
+        }
 
         const fetchedAlbum: AlbumInfo = {
           hashId,
@@ -121,11 +126,6 @@ function AlbumInfo() {
       }
 
       const data = await response.json();
-
-      // TODO: Add a modal that gives the user the option to view list/update current rating entry
-      if(data.message === "This album is already in your list.") {
-        alert("This album is already in your list. Album not saved.")
-      }
 
       console.log('Data:', data)
     } catch (error) {
@@ -252,7 +252,7 @@ function AlbumInfo() {
             {/* Opens RatingModal */}
               <>
               <button 
-              onClick={() => openRatingModal()}
+              onClick={() => openRatingModal(album.hashId)}
               data-modal-target="static-modal">
                   Add
               </button>
