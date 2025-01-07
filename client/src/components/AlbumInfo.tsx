@@ -43,13 +43,6 @@ function AlbumInfo() {
     })
   }
 
-  // Check if album is already in usersSavedAlbums
-  const isAlbumSaved = (id: string) => {
-    if(savedAlbums?.some(album => album.id === id)) {
-      setIsSaved(true)
-    } 
-  } 
-
   const openRatingModal = () => {
     // Open modal if logged in
     if(isAuthenticated) {
@@ -74,7 +67,10 @@ function AlbumInfo() {
       
         const hashId = await generateId(album, artist);
 
-        isAlbumSaved(hashId);
+        // Check if album is already in usersSavedAlbums
+          if(savedAlbums?.some(album => album.id === hashId)) {
+            setIsSaved(true)
+          } 
 
         const fetchedAlbum: AlbumInfo = {
           hashId,
@@ -96,7 +92,7 @@ function AlbumInfo() {
     } catch(error) {
       console.error(error)
     }
-  }, []);
+  }, [savedAlbums]);
 
   useEffect(() => {
       if(params.artistName && params.albumName) {
