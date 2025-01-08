@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import VinylImage from '../Navbar/vinyl-image.png'
 
-function RatingModal( {onSubmitRating, closeModal}: { onSubmitRating: (rating: number | null) => void; closeModal: () => void } ) {
+function RatingModal( {onSubmitRating, closeModal }: { onSubmitRating: (rating: number | null) => void; closeModal: () => void } ) {
 
   // State for ratings
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
@@ -38,7 +38,7 @@ function RatingModal( {onSubmitRating, closeModal}: { onSubmitRating: (rating: n
                 {/* Modal header  */}
                 <div className="flex justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                     <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                        Add a Rating ?
+                        Rate this album
                     </h2>
                     {/* Close modal button */}
                     <button 
@@ -74,7 +74,7 @@ function RatingModal( {onSubmitRating, closeModal}: { onSubmitRating: (rating: n
                 
                 {/* Modal footer  */}
                 <div className="flex items-end p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
-                    <button onClick={handleSkip} type="button" className="py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Skip</button>
+                    <button onClick={handleSkip} type="button" className="py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Add without rating</button>
                     <button onClick={handleSubmit} type="button" className="ms-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Add with Rating</button>
                 </div>
             </div>

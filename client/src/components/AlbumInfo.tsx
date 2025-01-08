@@ -28,6 +28,7 @@ function AlbumInfo() {
   const [open, setOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [isSaved, setIsSaved] = useState<boolean>(false)
+  const [updatingRating, setUpdatingRating] = useState<boolean>(false)
 
   const { isAuthenticated } = useAuth();
   const { savedAlbums, usersAlbums } = useAlbumContext();
@@ -48,8 +49,12 @@ function AlbumInfo() {
     if(isAuthenticated) {
       // Check if album is already in list
       if(usersAlbums!.some(album => album.id === hashId)) {
-        alert("This album is already in your list. Album not saved.") 
-        return;
+        const changeRating = window.confirm("This album is already in your list. Update rating?") 
+        if(changeRating) {
+          setUpdatingRating(true);
+        } else {
+          return;
+        }
       }
       setModalOpen(true)
     } else {
@@ -113,8 +118,11 @@ function AlbumInfo() {
       const albumData = {albumId: hashId, title, artist, rating};
       console.log(albumData)
 
-      const response = await fetch(`http://localhost:5000/save-album`, {
-        method: 'POST',
+      // Save album if new, update rating if existing
+      const route = updatingRating ? 'update-rating' : 'save-album'; 
+
+      const response = await fetch(`http://localhost:5000/${route}`, {
+        method: updatingRating ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -168,6 +176,7 @@ function AlbumInfo() {
 
   const closeModal = () => {
     setModalOpen(false)
+    setUpdatingRating(false);
   }
 
   // Controls bookmarking
