@@ -59,6 +59,7 @@ function AlbumInfo() {
     }
   }
   
+  // Fetch Album info and store it in state
   const albumInfo = useCallback(async (artist: string, album: string) => {
     try {
       const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=album.getInfo&api_key=${apiKey}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`);
@@ -133,6 +134,7 @@ function AlbumInfo() {
     }
   }
 
+  // Delete album from users list
   const removeAlbum = async (albumId:string, rating: number | null) => {
     console.log("Deleting...")
     console.log("SAVED ALBUMS:",savedAlbums)
@@ -168,6 +170,7 @@ function AlbumInfo() {
     setModalOpen(false)
   }
 
+  // Controls bookmarking
   const toggleBookmarkFunction = async (id:string, title:string, artist:string , rating: number) => {
     // Save if logged in
     if(isAuthenticated) {

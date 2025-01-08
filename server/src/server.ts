@@ -306,6 +306,46 @@ app.delete('/remove-album', checkAuth, async (req,res) => {
     }
 })
 
+// Route to update album rating
+app.put('/update-rating', checkAuth, async (req,res) => {
+    const typedReq = req as AuthenticatedRequest;
+
+    const { albumId, rating } = typedReq.body;
+
+    try {
+        // Ensure user is authenticated
+        if(!typedReq.session.userInfo) { 
+            res.status(401).json({error: 'User not authenticated'})
+            return 
+        }
+        
+        // Set cognitoId and then search for user
+        const cognitoId = typedReq.session.userInfo.sub
+
+        const user = await User.findOne({ cognitoId });
+
+        if(!user) {
+            res.status(404).json({ message: 'Cannot find user' });
+            return 
+        }
+
+        const album = user.usersAlbums.find(album => album.id === albumId); 
+
+        if(album) {
+            album.rating = rating;
+            await user.save();
+            res.status(200).json({message: 'Rating updated'})
+        } else {
+            res.status(404).json({message: 'Album not found in list'})
+            return
+        }
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({message: 'Error while updating rating'})
+    }
+})
+
 // MongoDB connection setup
 mongoose.connect(uri)
 .then(() => console.log("Connected to DB"))
