@@ -30,6 +30,29 @@ function Profile() {
         }
     };
 
+      // Delete album from users list
+  const removeAlbum = async (albumId:string, rating: number | null) => {
+    console.log("Deleting...")
+    console.log("SAVED ALBUMS:",savedAlbums)
+    try {    
+      const response = await fetch('http://localhost:5000/remove-album', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({albumId, rating})
+        });
+
+      if(!response.ok) {
+        throw new Error(`Error: ${response.status}`)
+      }
+      
+    } catch (error) {
+      console.error("Error removing album:",error)
+    }
+  }
+
     return(
       <>
 
@@ -50,11 +73,12 @@ function Profile() {
                         {/* Condionally render users albums */}
                         Your albums: {usersAlbums ? ( 
                             usersAlbums.map((album, index) => (
-                            <p 
+                            <div 
                                 // Ensure key is unique
                                 key={`${index}`}>
                                     <b>{album.title}</b> - {album.artist}
-                            </p>
+                                    <button onClick={() => removeAlbum(album.id, album.rating!)}>Remove</button>
+                            </div>
                             )) 
                         ) : ( 
                             <p>No albums yet</p> 
@@ -68,6 +92,7 @@ function Profile() {
                                 // Ensure key is unique
                                 key={`${index}`}>
                                     <b>{album.title}</b> - {album.artist}
+                                    <button onClick={() => removeAlbum(album.id, 0)}>Remove</button>
                             </p>
                             )) 
                         ) : ( 
