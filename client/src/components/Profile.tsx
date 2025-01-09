@@ -5,7 +5,6 @@ import { useAuth } from "../contexts/AuthContext/useAuth";
 import { useAlbumContext } from "../contexts/AlbumContext/useAlbumContext";
 
 function Profile() {
-
     const { isAuthenticated, username, email, logout} = useAuth();
     const { usersAlbums, savedAlbums } = useAlbumContext();
 
@@ -30,28 +29,28 @@ function Profile() {
         }
     };
 
-      // Delete album from users list
-  const removeAlbum = async (albumId:string, rating: number | null) => {
-    console.log("Deleting...")
-    console.log("SAVED ALBUMS:",savedAlbums)
-    try {    
-      const response = await fetch('http://localhost:5000/remove-album', {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include',
-          body: JSON.stringify({albumId, rating})
-        });
+    // Delete album from users list
+    const removeAlbum = async (albumId:string, rating: number | null) => {
+        console.log("Deleting...")
+        console.log("SAVED ALBUMS:",savedAlbums)
+        try {    
+        const response = await fetch('http://localhost:5000/remove-album', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({albumId, rating})
+            });
 
-      if(!response.ok) {
-        throw new Error(`Error: ${response.status}`)
-      }
-      
-    } catch (error) {
-      console.error("Error removing album:",error)
+        if(!response.ok) {
+            throw new Error(`Error: ${response.status}`)
+        }
+        
+        } catch (error) {
+        console.error("Error removing album:",error)
+        }
     }
-  }
 
     return(
       <>
