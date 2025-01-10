@@ -1,10 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom"
-import Navbar from "./Navbar/Navbar";
-import Searchbar from "./Searchbar";
-import RatingModal from "./modals/RatingModal";
-import { useAuth } from "../contexts/AuthContext/useAuth";
-import { useAlbumContext } from "../contexts/AlbumContext/useAlbumContext";
+import Navbar from "../Navbar/Navbar";
+import Searchbar from "../Searchbar";
+import RatingModal from "../modals/RatingModal";
+import { useAuth } from "../../contexts/AuthContext/useAuth";
+import { useAlbumContext } from "../../contexts/AlbumContext/useAlbumContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookmark } from '@fortawesome/free-solid-svg-icons';
 

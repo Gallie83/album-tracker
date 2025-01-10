@@ -132,7 +132,7 @@ function App() {
               >
             {albums.map((album) => (
               <Link
-                to={`/album-info/${album.artist}/${album.title}`}
+                to={`/album-info/${encodeURIComponent(album.artist)}/${encodeURIComponent(album.title)}`}
                 className="bg-slate-500 px-3 py-2 mx-3 my-2 rounded-lg"
                 key={album.id}
               >
