@@ -264,8 +264,8 @@ function AlbumInfo() {
             {/* Opens RatingModal */}
               <>
               <button 
-              onClick={() => openRatingModal(album.hashId)}
-              data-modal-target="static-modal">
+                onClick={() => openRatingModal(album.hashId)}
+                data-testid="toggleModalButton">
                   Add
               </button>
               <br />
@@ -283,7 +283,7 @@ function AlbumInfo() {
             </div>
 
             {/* Album information */}
-            <div className="mt-4 border-t pt-4 overflow-y-auto max-h-96 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+            <div data-testid="description" className="mt-4 border-t pt-4 overflow-y-auto max-h-96 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
               {album.description}
             </div>
 
