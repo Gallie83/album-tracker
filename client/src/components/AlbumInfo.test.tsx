@@ -1,22 +1,29 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import "@testing-library/jest-dom";
 import { describe, it, expect } from 'vitest'
-import { MemoryRouter, Route, Routes } from "react-router-dom";
 import AlbumInfo from "./AlbumInfo";
-
-console.log("EXPECT:",expect)
+import { AuthProvider } from "../contexts/AuthContext/AuthContext"; 
+import { AlbumProvider } from "../contexts/AlbumContext/AlbumContext"; 
 
 describe("AlbumInfo component", () => {
-    it("renders album + artist name", () => {
+    it("renders album + artist name", async () => {
         render(
             <MemoryRouter initialEntries={["/album-info/Daft%20Punk/Discovery"]}>
-                <Routes>
-                    <Route path="/album-info/:artistName/:albumName" element={<AlbumInfo/>}></Route>
-                </Routes>
+                <AuthProvider>
+                    <AlbumProvider>
+                        <Routes>
+                            <Route path="/album-info/:artistName/:albumName" element={<AlbumInfo/>}></Route>
+                        </Routes>
+                    </AlbumProvider>
+                </AuthProvider>
             </MemoryRouter>
         );
-        expect(screen.getByText("Discovery")).toBeInTheDocument();
-        expect(screen.getByText("Daft Punk")).toBeInTheDocument();
+
+        const title = await screen.findByRole('heading', { name: /Discovery/i})
+        const artist = await screen.findByRole('link',{ name : /Daft Punk/i})
+        expect(title).toBeInTheDocument();
+        expect(artist).toBeInTheDocument();
     })
 })
