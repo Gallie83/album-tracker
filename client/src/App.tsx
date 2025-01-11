@@ -28,12 +28,24 @@ function App() {
   const carouselRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
-    // Fetches Genre tags and stores them in state
     const fetchTags = async () => {
-      const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=tag.getTopTags&api_key=${apiKey}&format=json`);
-      const data = await response.json()   
-      const names = data.toptags.tag.map((tag: {name: string}) => tag.name);
-      setTags(names)
+      // Check localStorage for tags 
+      const genreTags = localStorage.getItem('genreTags')
+      if(genreTags) {
+        setTags(JSON.parse(genreTags))
+      } else {
+          try {
+            // Fetches Genre tags and stores them in state
+            const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=tag.getTopTags&api_key=${apiKey}&format=json`);
+            const data = await response.json()   
+            const names = data.toptags.tag.map((tag: {name: string}) => tag.name);
+            setTags(names)
+            // Store in localStorage for next time
+            localStorage.setItem('genreTags', JSON.stringify(names))
+          } catch (error) {
+              console.error("Error fetching tags:", error)
+          }
+      }
     }
 
     fetchTags()
