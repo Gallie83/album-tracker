@@ -262,20 +262,20 @@ function AlbumInfo() {
             <div className="w-3/5 bg-green-300 flex flex-col justify-between p-6 px-16 leading-normal">
 
             {/* Opens RatingModal */}
-              <>
-              <button 
-                onClick={() => openRatingModal(album.hashId)}
-                data-testid="toggleModalButton">
-                  Add
-              </button>
-              <br />
+              <div>
+                <button 
+                  onClick={() => openRatingModal(album.hashId)}
+                  data-testid="toggleModalButton">
+                    Add
+                </button>
+                <br />
 
-              {/* Bookmark Icon */}
+                {/* Bookmark Icon */}
                 <FontAwesomeIcon 
                   onClick={() => toggleBookmarkFunction(album.hashId, album.title, album.artist, 0)} 
                   icon={faBookmark} 
                   color={ isSaved ? 'black' : 'white'} />
-                </>
+              </div>
 
             <div>
               <h4 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{album.title}</h4>

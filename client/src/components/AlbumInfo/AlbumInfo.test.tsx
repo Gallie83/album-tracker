@@ -40,41 +40,68 @@ describe("AlbumInfo component", () => {
     it("renders an album description", async () => {
         render(
             <MemoryRouter initialEntries={[`/album-info/${encodeURIComponent(mockAlbum.artist)}/${encodeURIComponent(mockAlbum.title)}`]}>
-            <AuthProvider>
-                <AlbumProvider>
-                    <Routes>
-                        <Route path="/album-info/:artistName/:albumName" element={<AlbumInfo/>}></Route>
-                    </Routes>
-                </AlbumProvider>
-            </AuthProvider>
-        </MemoryRouter>
+                <AuthProvider>
+                    <AlbumProvider>
+                        <Routes>
+                            <Route path="/album-info/:artistName/:albumName" element={<AlbumInfo/>}></Route>
+                        </Routes>
+                    </AlbumProvider>
+                </AuthProvider>
+            </MemoryRouter>
         )
 
         const description = await screen.findByTestId('description')
         expect(description).toBeInTheDocument();
     });
 
-    it("Modal only shows once button is clicked", () => {
+    it("Modal only shows once button is clicked", async () => {
         render(
             <MemoryRouter initialEntries={[`/album-info/${encodeURIComponent(mockAlbum.artist)}/${encodeURIComponent(mockAlbum.title)}`]}>
-            <AuthProvider>
-                <AlbumProvider>
-                    <Routes>
-                        <Route path="/album-info/:artistName/:albumName" element={<AlbumInfo/>}></Route>
-                    </Routes>
-                </AlbumProvider>
-            </AuthProvider>
-        </MemoryRouter>
-        );
+                <AuthProvider>
+                    <AlbumProvider>
+                        <Routes>
+                            <Route path="/album-info/:artistName/:albumName" element={<AlbumInfo/>}></Route>
+                        </Routes>
+                    </AlbumProvider>
+                </AuthProvider>
+            </MemoryRouter>
+        )
 
-        screen.debug();
+        screen.debug()
 
         // Ensure it's not there before button click
         expect(screen.queryByTestId('rating-modal')).not.toBeInTheDocument();
 
         // Click button and check for Modal
-        const toggleModalButton = screen.getByText(/Add/i);
-        userEvent.click(toggleModalButton);
-        expect(screen.queryByTestId('rating-modal')).toBeInTheDocument();
+        const toggleModalButton = await screen.findByTestId("toggleModalButton");
+        await userEvent.click(toggleModalButton);
+
+        const modal = await screen.findByTestId('rating-modal');
+        expect(modal).toBeInTheDocument();
+
+        screen.debug();
     })
+
+    // it("Link is to the correct Last.fm details page", () => {
+    //     render(
+    //         <MemoryRouter initialEntries={[`/album-info/${encodeURIComponent(mockAlbum.artist)}/${encodeURIComponent(mockAlbum.title)}`]}>
+    //             <AuthProvider>
+    //                 <AlbumProvider>
+    //                     <Routes>
+    //                         <Route path="/album-info/:artistName/:albumName" element={<AlbumInfo/>}></Route>
+    //                     </Routes>
+    //                 </AlbumProvider>
+    //             </AuthProvider>
+    //         </MemoryRouter>
+    //     );
+
+
+    //     // Ensure it's not there before button click
+    //     expect(screen.queryByTestId('rating-modal')).not.toBeInTheDocument();
+
+    //     // Click button and check for Modal
+    //     const toggleModalButton = screen.getByText(/Add/i);
+    //     userEvent.click(toggleModalButton);
+    //     expect(screen.queryByTestId('rating-modal')).toBeInTheDocument();
+    // })
 })

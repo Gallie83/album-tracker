@@ -28,6 +28,7 @@ function App() {
   const carouselRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
+    // TODO: optimize load time even more, fetching genres and albums can be slow at times
     const fetchTags = async () => {
       // Check localStorage for tags 
       const genreTags = localStorage.getItem('genreTags')
