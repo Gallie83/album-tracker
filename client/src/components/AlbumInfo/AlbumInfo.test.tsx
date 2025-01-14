@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import "@testing-library/jest-dom";
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import AlbumInfo from "./AlbumInfo";
 import { AuthProvider } from "../../contexts/AuthContext/AuthContext"; 
 import { AlbumProvider } from "../../contexts/AlbumContext/AlbumContext"; 
@@ -54,34 +54,30 @@ describe("AlbumInfo component", () => {
         expect(description).toBeInTheDocument();
     });
 
-    // it("Add button changes modalOpen boolean", async () => {
+    it("Add button changes modalOpen boolean", async () => {
 
-    //     render(
-    //         <MemoryRouter initialEntries={[`/album-info/${encodeURIComponent(mockAlbum.artist)}/${encodeURIComponent(mockAlbum.title)}`]}>
-    //             <AuthProvider>
-    //                 <AlbumProvider>
-    //                     <Routes>
-    //                         <Route path="/album-info/:artistName/:albumName" element={<AlbumInfo/>}></Route>
-    //                     </Routes>
-    //                 </AlbumProvider>
-    //             </AuthProvider>
-    //         </MemoryRouter>
-    //     )
+        render(
+            <MemoryRouter initialEntries={[`/album-info/${encodeURIComponent(mockAlbum.artist)}/${encodeURIComponent(mockAlbum.title)}`]}>
+                <AuthProvider>
+                    <AlbumProvider>
+                        <Routes>
+                            <Route path="/album-info/:artistName/:albumName" element={<AlbumInfo/>}></Route>
+                        </Routes>
+                    </AlbumProvider>
+                </AuthProvider>
+            </MemoryRouter>
+        )
 
-    //     // Ensure it's not there before button click
-    //     expect(screen.queryByTestId('rating-modal')).not.toBeInTheDocument();
+        // Ensure it's not there before button click
+        expect(screen.queryByTestId('rating-modal')).not.toBeInTheDocument();
 
-    //     // Click button and check for Modal
-    //     const toggleModalButton = await screen.findByTestId("toggleModalButton");
-    //     await userEvent.click(toggleModalButton);
+        // Click button and check for Modal
+        const toggleModalButton = await screen.findByTestId("toggleModalButton");
+        await userEvent.click(toggleModalButton);
 
-    //     screen.debug();
+            expect(screen.findByTestId('rating-modal')).toBeInTheDocument();
 
-    //     await waitFor(() =>{
-    //         expect(screen.findByTestId('rating-modal')).toBeInTheDocument();
-    //     })
-
-    // })
+    })
 
     it("Link is to the correct Last.fm details page", async () => {
         render(

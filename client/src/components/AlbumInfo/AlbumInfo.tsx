@@ -26,7 +26,7 @@ function AlbumInfo() {
   const params = useParams<{artistName:string , albumName: string, albumHashId: string}>();
   const [album, setAlbum] = useState<AlbumInfo>();
   const [open, setOpen] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(true);
   const [isSaved, setIsSaved] = useState<boolean>(false)
   const [updatingRating, setUpdatingRating] = useState<boolean>(false)
 
@@ -281,6 +281,7 @@ function AlbumInfo() {
 
                 {/* Bookmark Icon */}
                 <FontAwesomeIcon 
+                  data-testid="bookmark-button"
                   onClick={() => toggleBookmarkFunction(album.hashId, album.title, album.artist, 0)} 
                   icon={faBookmark} 
                   color={ isSaved ? 'black' : 'white'} />
