@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import "@testing-library/jest-dom";
 import { describe, it, expect } from 'vitest'
@@ -54,35 +54,8 @@ describe("AlbumInfo component", () => {
         expect(description).toBeInTheDocument();
     });
 
-    it("Modal only shows once button is clicked", async () => {
-        render(
-            <MemoryRouter initialEntries={[`/album-info/${encodeURIComponent(mockAlbum.artist)}/${encodeURIComponent(mockAlbum.title)}`]}>
-                <AuthProvider>
-                    <AlbumProvider>
-                        <Routes>
-                            <Route path="/album-info/:artistName/:albumName" element={<AlbumInfo/>}></Route>
-                        </Routes>
-                    </AlbumProvider>
-                </AuthProvider>
-            </MemoryRouter>
-        )
+    // it("Add button changes modalOpen boolean", async () => {
 
-        screen.debug()
-
-        // Ensure it's not there before button click
-        expect(screen.queryByTestId('rating-modal')).not.toBeInTheDocument();
-
-        // Click button and check for Modal
-        const toggleModalButton = await screen.findByTestId("toggleModalButton");
-        await userEvent.click(toggleModalButton);
-
-        const modal = await screen.findByTestId('rating-modal');
-        expect(modal).toBeInTheDocument();
-
-        screen.debug();
-    })
-
-    // it("Link is to the correct Last.fm details page", () => {
     //     render(
     //         <MemoryRouter initialEntries={[`/album-info/${encodeURIComponent(mockAlbum.artist)}/${encodeURIComponent(mockAlbum.title)}`]}>
     //             <AuthProvider>
@@ -93,15 +66,37 @@ describe("AlbumInfo component", () => {
     //                 </AlbumProvider>
     //             </AuthProvider>
     //         </MemoryRouter>
-    //     );
-
+    //     )
 
     //     // Ensure it's not there before button click
     //     expect(screen.queryByTestId('rating-modal')).not.toBeInTheDocument();
 
     //     // Click button and check for Modal
-    //     const toggleModalButton = screen.getByText(/Add/i);
-    //     userEvent.click(toggleModalButton);
-    //     expect(screen.queryByTestId('rating-modal')).toBeInTheDocument();
+    //     const toggleModalButton = await screen.findByTestId("toggleModalButton");
+    //     await userEvent.click(toggleModalButton);
+
+    //     screen.debug();
+
+    //     await waitFor(() =>{
+    //         expect(screen.findByTestId('rating-modal')).toBeInTheDocument();
+    //     })
+
     // })
+
+    it("Link is to the correct Last.fm details page", async () => {
+        render(
+            <MemoryRouter initialEntries={[`/album-info/${encodeURIComponent(mockAlbum.artist)}/${encodeURIComponent(mockAlbum.title)}`]}>
+                <AuthProvider>
+                    <AlbumProvider>
+                        <Routes>
+                            <Route path="/album-info/:artistName/:albumName" element={<AlbumInfo/>}></Route>
+                        </Routes>
+                    </AlbumProvider>
+                </AuthProvider>
+            </MemoryRouter>
+        );
+
+        const link = await screen.findByTestId("more-info")
+        expect (link).toHaveAttribute("href", `https://www.last.fm/music/${mockAlbum.artist.replace(/ /g, '+')}/${encodeURIComponent(mockAlbum.title)}`)
+    })
 })

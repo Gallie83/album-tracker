@@ -207,6 +207,16 @@ function AlbumInfo() {
       {album ? (
         // Outer div
         <div className="flex items-center justify-center h-screen">
+
+          {/* Rating modal  */}
+          {modalOpen && ( <RatingModal 
+                            data-testid="rating-modal"
+                            closeModal={closeModal}
+                            onSubmitRating={handleRating}>
+                          </RatingModal> 
+              )}
+
+
           <div key={album.hashId} className="flex w-11/12 items-stretch bg-pink-300 border border-gray-200 rounded-lg md:flex-row p-5">
             {/* Left Section with Image and Track List */}
             <div className="flex flex-col w-2/5 p-2 bg-slate-600">
@@ -227,8 +237,7 @@ function AlbumInfo() {
                 style={{
                   // Move label up when open
                   transform: open ? "translateY(-3rem)" : "translateY(0)", 
-                }}
-              >
+                }}>
                 {/* Track List Button */}
                 <label
                   htmlFor="trackListToggle"
@@ -288,16 +297,9 @@ function AlbumInfo() {
             </div>
 
             {/* Link to Album page on Last.fm */}
-              <a target="_blank" rel="noopener noreferrer" className="border border-black p-1 bg-stone-400" href={album.url}>More info</a>
+              <a data-testid="more-info" target="_blank" rel="noopener noreferrer" className="border border-black p-1 bg-stone-400" href={album.url}>More info</a>
 
             </div>
-
-            {/* Rating modal  */}
-            {modalOpen && ( <RatingModal 
-                              closeModal={closeModal}
-                              onSubmitRating={handleRating}>
-                            </RatingModal> 
-                          )}
 
           </div>
         </div>
