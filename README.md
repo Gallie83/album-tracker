@@ -18,24 +18,28 @@ VYNYL is built using the MERN stack with TypeScript, using the Last.fm Api for d
 
 # Technologies Used
 
-## Languages
+### Languages
 
 - [HTML5](https://en.wikipedia.org/wiki/HTML) - Provides the frontend content and structure for the website.
 - [CSS3](https://en.wikipedia.org/wiki/CSS) - Provides the all stylings throughout the website, using [Tailwind](https://tailwindcss.com/) for ease and efficiency.
 - [JavaScript](https://en.wikipedia.org/wiki/JavaScript) - The foundational language for the website, powering the frontend with [React](https://react.dev/) and [TypeScript](https://www.typescriptlang.org/) for type checking, and the backend with [Node.js](https://nodejs.org/en) and [Express](https://expressjs.com/).
 
-## Version Control
+### Version Control
 
 - [Git](https://git-scm.com/) - Used for version control.
 - [Github](https://github.com/) - Used to host and edit the website.
 
-## Database
+### Database
 
 - [MongoDB](https://www.mongodb.com/) - NoSQL database used to store all user-related data.
 
 - [MongoDB Atlas](https://www.mongodb.com/products/platform/atlas-database) - A cloud-based database service used to host and manage the application's MongoDB data
 
+### Login and Authentication
+
 - [Amazon Web Services Cognito](https://aws.amazon.com/cognito/) - Used for all Login and Authentication.
+
+### Coding tools
 
 - [VSCode](https://code.visualstudio.com/) - Used for writing all the websites code.
 
@@ -45,7 +49,9 @@ VYNYL is built using the MERN stack with TypeScript, using the Last.fm Api for d
 
 ## User
 
-- This schema defines the structure for storing user-related data such as their information, albums and groups in MongoDB:
+- This schema defines the structure for storing user-related data such as their information, albums and groups in MongoDB
+
+```
   - cognitoId: Identification used with Amazon Cognito
   - username: The user's chosen display name
   - email: User's email address
@@ -60,11 +66,13 @@ VYNYL is built using the MERN stack with TypeScript, using the Last.fm Api for d
     - artist: Artist name
     - id: Unique Hashed Id
   - groups: Reference to the Group schema below
+```
 
 ## Group
 
-- This schema is for groups that users can make together that serve as album-listening clubs
+This schema is for groups that users can make together that serve as album-listening club
 
+```
   - title: Album title
   - members: A reference to User schemas
   - albums: Albums that users have added for group listening
@@ -75,3 +83,6 @@ VYNYL is built using the MERN stack with TypeScript, using the Last.fm Api for d
       - user: Reference to User schema
       - rating: Album rating
     - dateListened: records date the users rated the album
+```
+
+[Back to top](#contents)
