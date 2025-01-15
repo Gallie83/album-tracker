@@ -1,8 +1,8 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import "@testing-library/jest-dom";
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import AlbumInfo from "./AlbumInfo";
 import { AuthProvider } from "../../contexts/AuthContext/AuthContext"; 
 import { AlbumProvider } from "../../contexts/AlbumContext/AlbumContext"; 
@@ -54,6 +54,7 @@ describe("AlbumInfo component", () => {
         expect(description).toBeInTheDocument();
     });
 
+    // TODO: Fix RatingModal not being found afer button press
     it("Add button changes modalOpen boolean", async () => {
 
         render(
@@ -95,4 +96,38 @@ describe("AlbumInfo component", () => {
         const link = await screen.findByTestId("more-info")
         expect (link).toHaveAttribute("href", `https://www.last.fm/music/${mockAlbum.artist.replace(/ /g, '+')}/${encodeURIComponent(mockAlbum.title)}`)
     })
+
+    // it("Bookmark button saves album", async () => {
+
+    //     render(
+    //         <MemoryRouter initialEntries={[`/album-info/${encodeURIComponent(mockAlbum.artist)}/${encodeURIComponent(mockAlbum.title)}`]}>
+    //             <AuthProvider>
+    //                 <AlbumProvider>
+    //                     <Routes>
+    //                         <Route path="/album-info/:artistName/:albumName" element={<AlbumInfo/>}></Route>
+    //                     </Routes>
+    //                 </AlbumProvider>
+    //             </AuthProvider>
+    //         </MemoryRouter>
+    //     );
+
+    //     // Assuming there's a button with a test ID to trigger toggleBookmarkFunction
+    //     const button = screen.getByTestId("bookmark-button");
+
+    //     // Click the button to toggle bookmark
+    //     userEvent.click(button);
+
+    //     // Wait for the fetch function to be called
+    //     await waitFor(() => expect(global.fetch).toHaveBeenCalledWith(
+    //     expect.stringContaining('save-album'),
+    //     expect.objectContaining({
+    //         method: "POST",
+    //         body: expect.any(String),
+    //     })
+    //     ));
+
+    //     // Check that the album is added correctly
+    //     expect(global.fetch).toHaveBeenCalled();
+    //     expect(window.location.replace).not.toHaveBeenCalled();
+    // })
 })
