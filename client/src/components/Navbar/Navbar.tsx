@@ -27,8 +27,6 @@ function Navbar() {
     }
   };
 
-
-
   return (
     <>
       {/* Button with image */}

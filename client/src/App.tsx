@@ -115,8 +115,7 @@ function App() {
 
   return (
     <>
-    <div className="flex fixed top-0 left-0 ml-3 mt-3">
-
+    <div className="fixed top-0 left-0 ml-3 mt-3 z-50">
     <Navbar />
     </div>
 

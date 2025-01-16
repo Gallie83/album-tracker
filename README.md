@@ -14,8 +14,6 @@ VYNYL is built using the MERN stack with TypeScript, using the Last.fm Api for d
   - [User](#user)
   - [Group](#group)
 
-[Back to top](#contents)
-
 # Technologies Used
 
 ### Languages
