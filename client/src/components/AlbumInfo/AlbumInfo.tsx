@@ -26,7 +26,7 @@ function AlbumInfo() {
   const params = useParams<{artistName:string , albumName: string, albumHashId: string}>();
   const [album, setAlbum] = useState<AlbumInfo>();
   const [open, setOpen] = useState(false);
-  const [modalOpen, setModalOpen] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
   const [isSaved, setIsSaved] = useState<boolean>(false)
   const [updatingRating, setUpdatingRating] = useState<boolean>(false)
 

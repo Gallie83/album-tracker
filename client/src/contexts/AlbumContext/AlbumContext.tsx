@@ -11,6 +11,8 @@ interface Album {
 interface AlbumContextType {
   usersAlbums: Album[] | null;
   savedAlbums: Album[] | null;
+  setUsersAlbums: React.Dispatch<React.SetStateAction<Album[] | null>>;
+  setSavedAlbums: React.Dispatch<React.SetStateAction<Album[] | null>>;
 }
 
 const AlbumContext = createContext<AlbumContextType | undefined>(undefined);
@@ -44,7 +46,7 @@ export const AlbumProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [isAuthenticated]);
 
   return (
-    <AlbumContext.Provider value={{ usersAlbums, savedAlbums }}>
+    <AlbumContext.Provider value={{ usersAlbums, savedAlbums, setUsersAlbums, setSavedAlbums }}>
       {children}
     </AlbumContext.Provider>
   );
