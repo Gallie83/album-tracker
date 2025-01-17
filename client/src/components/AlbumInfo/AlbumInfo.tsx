@@ -147,7 +147,6 @@ function AlbumInfo() {
       ]);
     }
 
-
       const data = await response.json();
 
       console.log('Data:', data)

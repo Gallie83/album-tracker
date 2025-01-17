@@ -54,7 +54,24 @@ describe("AlbumInfo component", () => {
         expect(description).toBeInTheDocument();
     });
 
-    // TODO: Fix RatingModal not being found afer button press
+    it("Link is to the correct Last.fm details page", async () => {
+        render(
+            <MemoryRouter initialEntries={[`/album-info/${encodeURIComponent(mockAlbum.artist)}/${encodeURIComponent(mockAlbum.title)}`]}>
+                <AuthProvider>
+                    <AlbumProvider>
+                        <Routes>
+                            <Route path="/album-info/:artistName/:albumName" element={<AlbumInfo/>}></Route>
+                        </Routes>
+                    </AlbumProvider>
+                </AuthProvider>
+            </MemoryRouter>
+        );
+
+        const link = await screen.findByTestId("more-info")
+        expect (link).toHaveAttribute("href", `https://www.last.fm/music/${mockAlbum.artist.replace(/ /g, '+')}/${encodeURIComponent(mockAlbum.title)}`)
+    })
+
+    // RatingModal not being found afer button press
     it("Add button changes modalOpen boolean", async () => {
 
         render(
@@ -80,23 +97,7 @@ describe("AlbumInfo component", () => {
 
     })
 
-    it("Link is to the correct Last.fm details page", async () => {
-        render(
-            <MemoryRouter initialEntries={[`/album-info/${encodeURIComponent(mockAlbum.artist)}/${encodeURIComponent(mockAlbum.title)}`]}>
-                <AuthProvider>
-                    <AlbumProvider>
-                        <Routes>
-                            <Route path="/album-info/:artistName/:albumName" element={<AlbumInfo/>}></Route>
-                        </Routes>
-                    </AlbumProvider>
-                </AuthProvider>
-            </MemoryRouter>
-        );
-
-        const link = await screen.findByTestId("more-info")
-        expect (link).toHaveAttribute("href", `https://www.last.fm/music/${mockAlbum.artist.replace(/ /g, '+')}/${encodeURIComponent(mockAlbum.title)}`)
-    })
-
+    // Mocking the fetch response is throwing errors
     // it("Bookmark button saves album", async () => {
 
     //     render(
@@ -117,17 +118,6 @@ describe("AlbumInfo component", () => {
     //     // Click the button to toggle bookmark
     //     userEvent.click(button);
 
-    //     // Wait for the fetch function to be called
-    //     await waitFor(() => expect(global.fetch).toHaveBeenCalledWith(
-    //     expect.stringContaining('save-album'),
-    //     expect.objectContaining({
-    //         method: "POST",
-    //         body: expect.any(String),
-    //     })
-    //     ));
 
-    //     // Check that the album is added correctly
-    //     expect(global.fetch).toHaveBeenCalled();
-    //     expect(window.location.replace).not.toHaveBeenCalled();
     // })
 })
