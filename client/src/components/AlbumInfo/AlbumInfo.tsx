@@ -31,7 +31,7 @@ function AlbumInfo() {
   const [updatingRating, setUpdatingRating] = useState<boolean>(false)
 
   const { isAuthenticated } = useAuth();
-  const { savedAlbums, usersAlbums } = useAlbumContext();
+  const { usersAlbums, setUsersAlbums, savedAlbums, setSavedAlbums} = useAlbumContext();
 
   // Hash albums name+artist to use as ID, as mbid missing from majority of albums
   const generateId = (albumName: string, artistName: string) => {
@@ -133,6 +133,20 @@ function AlbumInfo() {
       if(!response.ok) {
         throw new Error(`Error: ${response.status}`)
       }
+
+    // Update albums in context after they're added
+    if (rating === 0) {
+      setSavedAlbums((prev) => [
+        ...(prev?.filter((album) => album.id !== hashId) || []),
+        { ...albumData, id: albumData.albumId }, 
+      ]);
+    } else {
+      setUsersAlbums((prev) => [
+        ...(prev?.filter((album) => album.id !== hashId) || []),
+        { ...albumData, id: albumData.albumId }, 
+      ]);
+    }
+
 
       const data = await response.json();
 

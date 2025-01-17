@@ -3,7 +3,6 @@ import Navbar from "./Navbar/Navbar";
 import Searchbar from "./Searchbar";
 import { useAuth } from "../contexts/AuthContext/useAuth";
 import { useAlbumContext } from "../contexts/AlbumContext/useAlbumContext";
-import { useEffect } from "react";
 
 function Profile() {
     const { isAuthenticated, username, email, logout} = useAuth();
@@ -56,10 +55,6 @@ function Profile() {
         console.error("Error removing album:",error)
         }
     }
-
-    useEffect(() => {
-
-    }, [usersAlbums, savedAlbums])
 
     return(
       <>
