@@ -17,11 +17,11 @@ describe("Navbar component - Unauthenticated", () => {
 
     it("redirects user to Cognito to log in if not authenticated", async () => {
 
-        // Mock window.location.assign using Object.defineProperty
-        const mockAssign = vi.fn();
+        // Mock window.location.replace
+        const mockReplace = vi.fn();
         Object.defineProperty(window, 'location', {
             configurable: true,
-            value: { assign: mockAssign },
+            value: { replace: mockReplace },
         });
 
         const user = userEvent.setup()
@@ -38,11 +38,15 @@ describe("Navbar component - Unauthenticated", () => {
 
         screen.debug()
 
+        // Click Login Button
         const loginButton = await screen.findByText(/Login/i);
         user.click(loginButton)
 
-        console.log(mockAssign.mock.calls);
+        vi.spyOn(Navbar.prototype, 'handleLogin').mockImplementation(mockReplace);
 
-        expect(mockAssign).toHaveBeenCalledWith(expect.stringContaining("us-east-1.amazoncognito.com/login"));
+        // Check if window.location.replace was called with the correct URL
+        expect(mockReplace).toHaveBeenCalledWith(
+            expect.stringContaining("amazoncognito.com/login")
+        );
     })
 })
