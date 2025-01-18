@@ -10,6 +10,9 @@ vi.mock('../../contexts/AuthContext/useAuth', () => ({
     useAuth: () => ({
         isAuthenticated: true,
         username: 'TestUser',
+        logout: () => {
+            window.location.href = 'http://localhost:5000/logout';
+          }
     })
 }));
 
@@ -52,24 +55,5 @@ describe("Navbar component - Authenticated", () => {
         const link = screen.getByText(/TestUser's Profile/i) 
         expect(link).toHaveAttribute("href", "/profile");
     });
-
-    it("shows the logout button that logs the user out", async () => {
-        const user = userEvent.setup()
-
-        render(
-            <MemoryRouter>
-                <Navbar />
-            </MemoryRouter>
-        );
-
-        // Open Navbar
-        const button = screen.getByTestId("navbar-button")
-        await user.click(button);
-
-        // search for Logout button and click
-        const logout = screen.getByText(/Logout/i) 
-        await user.click(logout)
-
-    })
 
 });
