@@ -1,34 +1,51 @@
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { MemoryRouter } from "react-router-dom";
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import userEvent from "@testing-library/user-event";
 import Navbar from "./Navbar";
+import { AuthContext, AuthState } from "../../contexts/AuthContext/AuthContext";
 
 // Mock the auth context
-vi.mock('../../contexts/AuthContext/useAuth', () => ({
-    useAuth: () => ({
-        isAuthenticated: false,
-        username: null,
-    })
-}));
+const mockAuthContextValue: AuthState = {
+    isAuthenticated: false,
+    username: null,
+    email: null,
+}
 
 describe("Navbar component - Unauthenticated", () => {
 
-    it("redirects user to Cognito to log in if not authenticated", async () => {
+    const oldWindowLocation = window.location;
+    const replaceSpy = vi.fn();
 
-        // Mock window.location.replace
-        const mockReplace = vi.fn();
+    beforeEach(() => {
+        vi.clearAllMocks();
+        
+        // Mock window.location with a spy for replace
         Object.defineProperty(window, 'location', {
             configurable: true,
-            value: { replace: mockReplace },
+            value: { 
+                pathname: '/current-page',
+                replace: replaceSpy
+            },
         });
+    });
 
+    afterEach(() => {
+        Object.defineProperty(window, 'location', {
+            configurable: true,
+            value: oldWindowLocation,
+        });
+    });
+
+    it("redirects user to Cognito to log in if not authenticated", async () => {
         const user = userEvent.setup()
 
         render(
             <MemoryRouter>
-                <Navbar />
+                <AuthContext.Provider value={mockAuthContextValue}>
+                    <Navbar />
+                </AuthContext.Provider>
             </MemoryRouter>
         );
 
@@ -36,17 +53,13 @@ describe("Navbar component - Unauthenticated", () => {
         const button = screen.getByTestId("navbar-button")
         await user.click(button);
 
-        screen.debug()
-
         // Click Login Button
         const loginButton = await screen.findByText(/Login/i);
         user.click(loginButton)
 
-        vi.spyOn(Navbar.prototype, 'handleLogin').mockImplementation(mockReplace);
-
         // Check if window.location.replace was called with the correct URL
-        expect(mockReplace).toHaveBeenCalledWith(
-            expect.stringContaining("amazoncognito.com/login")
+        expect(replaceSpy).toHaveBeenCalledWith(
+            expect.stringContaining("http://localhost:5000/login")
         );
     })
 })
