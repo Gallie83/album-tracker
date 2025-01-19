@@ -65,8 +65,8 @@ function Navbar() {
                 <a onClick={handleLogin}>Login</a>
                 )}
             <li>
-              <button onClick={() => setIsFeedbackModalOpen(true)} className="bg-blue-500 px-4 py-2 rounded">
-                Leave Feedback
+              <button onClick={() => setIsFeedbackModalOpen(true)}>
+                Submit Feedback
               </button>
             </li>            
           </ul>
