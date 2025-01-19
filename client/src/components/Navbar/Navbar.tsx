@@ -2,11 +2,14 @@ import { useState } from 'react';
 import VinylImage from './vinyl-image.png';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext/useAuth';
+import FeedbackForm from '../FeedbackForm';
 
 function Navbar() {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
 
   const {isAuthenticated, username, logout} = useAuth();
+
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState<boolean>(false)
 
   const handleLogin = async () => {
     try {
@@ -62,16 +65,15 @@ function Navbar() {
                 <a onClick={handleLogin}>Login</a>
                 )}
             <li>
-              <a
-                href="#"
-                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-              >
-                Settings
-              </a>
-            </li>
+              <button onClick={() => setIsFeedbackModalOpen(true)} className="bg-blue-500 px-4 py-2 rounded">
+                Leave Feedback
+              </button>
+            </li>            
           </ul>
         </div>
       )}
+      {/* Submit feedback modal */}
+      {isFeedbackModalOpen && <FeedbackForm onClose={() => setIsFeedbackModalOpen(false)}/>}
     </>
   );
 }
