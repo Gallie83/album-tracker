@@ -354,14 +354,15 @@ app.put('/update-rating', checkAuth, async (req,res) => {
 // Send email with feedback from users
 app.post("/submit-feedback", async (req,res) => {
     const { message } = req.body;
+    console.log("FEEDBACK RECEIVED")
 
     try { 
         // Configure the transporter
         const transporter = nodemailer.createTransport({
             service: "Gmail", // or your email provider's SMTP service
             auth: {
-            user: process.env.EMAIL_USER, // Your email address
-            pass: process.env.EMAIL_PASS, // App password or OAuth token
+            user: email_username, // Your email address
+            pass: email_password, // App password or OAuth token
             },
         });
 
