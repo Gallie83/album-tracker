@@ -8,6 +8,8 @@ import session from 'express-session';
 import { Issuer, generators, Client } from 'openid-client';
 import { Session, SessionData} from 'express-session';
 
+import nodemailer from 'nodemailer';
+
 dotenv.config();
 
 const app: Express = express();
@@ -25,6 +27,9 @@ const uri: string = process.env.MONGODB_URI || "";
 const user_pool_id: string = process.env.AMAZON_USER_POOL_ID || "";
 const client_id: string = process.env.AMAZON_CLIENT_ID || "";
 const client_secret: string = process.env.AMAZON_CLIENT_SECRET || "";
+
+const email_username = process.env.EMAIL_USERNAME
+const email_password = process.env.EMAIL_PASSWORD
 
 
 let client: Client;
@@ -343,6 +348,40 @@ app.put('/update-rating', checkAuth, async (req,res) => {
     } catch (error) {
         console.error(error)
         res.status(500).json({message: 'Error while updating rating'})
+    }
+})
+
+// Send email with feedback from users
+app.post("/submit-feedback", async (req,res) => {
+    const { message } = req.body;
+
+    try { 
+        // Configure the transporter
+        const transporter = nodemailer.createTransport({
+            service: "Gmail", // or your email provider's SMTP service
+            auth: {
+            user: process.env.EMAIL_USER, // Your email address
+            pass: process.env.EMAIL_PASS, // App password or OAuth token
+            },
+        });
+
+        // Email content
+        const mailOptions = {
+            from: email_username, 
+            to: email_username, 
+            subject: `New Feedback for VYNYL`,
+            text: `
+            You received feedback:
+            Message: ${message}
+            `,
+        };
+
+        // Send email
+        await transporter.sendMail(mailOptions);
+        res.status(200).send('Feedback submitted successfully!');
+    } catch (error) {
+        console.error("Error submitting feedback:", error);
+        res.status(500).send("Failed to submit feedback");
     }
 })
 
