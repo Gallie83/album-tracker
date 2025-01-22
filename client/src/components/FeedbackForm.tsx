@@ -2,7 +2,8 @@ import { useState } from "react"
 import ReactDOM from "react-dom"
 
 const FeedbackForm = ({onClose}: {onClose: () => void}) => {
-    const [feedback, setFeedback] = useState("")
+    const [feedback, setFeedback] = useState<string>("")
+    const [email, setEmail] = useState<string>("")
 
     // Sends email with feedback to my gmail account
     const submitFeedback = async () => {
@@ -12,7 +13,7 @@ const FeedbackForm = ({onClose}: {onClose: () => void}) => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({feedback})
+                body: JSON.stringify({feedback, email})
             });
 
             if(!response.ok) {
@@ -36,18 +37,28 @@ const FeedbackForm = ({onClose}: {onClose: () => void}) => {
                     <h2 className="text-xl font-semibold text-gray-900">Leave feedback</h2>
                 <button onClick={onClose} className="h-5 w-5 text-black">X</button>
                 </div>
-                <textarea 
-                    className="mb-3 w-full rounded-lg border border-gray-200 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-black text-black" 
-                    rows={4} 
-                    placeholder="Your feedback..." 
-                    value={feedback} 
-                    onChange={(e) => setFeedback(e.target.value)}>
-                </textarea>
-                <div className="mb-4 flex justify-start gap-2">
+                <div className="text-black">
+                    {/* <label htmlFor="email">Your Email (Optional)</label> */}
+                    <input 
+                        type="email" 
+                        className="mb-3 w-full rounded-lg border border-gray-200 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                        placeholder="Your Email (Optional)"
+                        value={email} 
+                        onChange={(e) => setEmail(e.target.value)}>
+                    </input>
+                    <textarea 
+                        className="mb-3 w-full rounded-lg border border-gray-200 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-black" 
+                        rows={4} 
+                        placeholder="Your feedback..." 
+                        value={feedback} 
+                        onChange={(e) => setFeedback(e.target.value)}>
+                    </textarea>
+                </div>
+                {/* <div className="mb-4 flex justify-start gap-2">
                     <button className="text-md rounded-lg border border-gray-200 px-2.5 py-1.5 hover:bg-gray-50">😞</button>
                     <button className="text-md rounded-lg border border-gray-200 px-2.5 py-1.5 hover:bg-gray-50">😐</button>
                     <button className="text-md rounded-lg border border-gray-200 px-2.5 py-1.5 hover:bg-gray-50">😊</button>
-                </div>
+                </div> */}
                 <button onClick={submitFeedback} className="w-full rounded-lg bg-gray-900 py-2.5 text-sm font-medium text-white transition duration-300 hover:bg-gray-800">Submit</button>
                 </div>
             </div>
