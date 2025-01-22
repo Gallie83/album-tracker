@@ -353,8 +353,10 @@ app.put('/update-rating', checkAuth, async (req,res) => {
 
 // Send email with feedback from users
 app.post("/submit-feedback", async (req,res) => {
-    const { message } = req.body;
-    console.log("FEEDBACK RECEIVED")
+    const typedReq = req as AuthenticatedRequest;
+
+    const { feedback } = typedReq.body;
+    console.log("FEEDBACK RECEIVED:", feedback)
 
     try { 
         // Configure the transporter
@@ -373,7 +375,7 @@ app.post("/submit-feedback", async (req,res) => {
             subject: `New Feedback for VYNYL`,
             text: `
             You received feedback:
-            Message: ${message}
+            Message: ${feedback}
             `,
         };
 
