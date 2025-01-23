@@ -355,7 +355,7 @@ app.put('/update-rating', checkAuth, async (req,res) => {
 app.post("/submit-feedback", async (req,res) => {
     const typedReq = req as AuthenticatedRequest;
 
-    const { feedback } = typedReq.body;
+    const { feedback, email } = typedReq.body;
     console.log("FEEDBACK RECEIVED:", feedback)
 
     try { 
@@ -376,6 +376,7 @@ app.post("/submit-feedback", async (req,res) => {
             text: `
             You received feedback:
             Message: ${feedback}
+            Email: ${email}
             `,
         };
 
