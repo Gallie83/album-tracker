@@ -19,7 +19,8 @@ VYNYL is built using the MERN stack with TypeScript, using the Last.fm Api for d
 ### Languages
 
 - [HTML5](https://en.wikipedia.org/wiki/HTML) - Provides the frontend content and structure for the website.
-- [CSS3](https://en.wikipedia.org/wiki/CSS) - Provides the all stylings throughout the website, using [Tailwind](https://tailwindcss.com/) for ease and efficiency.
+- [CSS3](https://en.wikipedia.org/wiki/CSS) - Provides the all stylings throughout the website, using
+  [Tailwind](https://tailwindcss.com/) for ease and efficiency.
 - [JavaScript](https://en.wikipedia.org/wiki/JavaScript) - The foundational language for the website, powering the frontend with [React](https://react.dev/) and [TypeScript](https://www.typescriptlang.org/) for type checking, and the backend with [Node.js](https://nodejs.org/en) and [Express](https://expressjs.com/).
 
 ### Version Control
@@ -37,9 +38,18 @@ VYNYL is built using the MERN stack with TypeScript, using the Last.fm Api for d
 
 - [Amazon Web Services Cognito](https://aws.amazon.com/cognito/) - Used for all Login and Authentication.
 
+### Testing
+
+- [Jest](https://jestjs.io/) - JavaScript testing framework used for unit testing different elements of the application
+- [Vitest](https://vitest.dev/) - Vite-native unit testing framework offering fast performance and built-in TypeScript support
+
 ### Coding tools
 
 - [VSCode](https://code.visualstudio.com/) - Used for writing all the websites code.
+
+### Receiving Feedback
+
+- [nodemail](https://nodemailer.com/) - Used to receive feedback from users. nodemailer sends an email to my gmail account with the users email and their feedback.
 
 [Back to top](#contents)
 

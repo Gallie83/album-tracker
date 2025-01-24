@@ -375,8 +375,8 @@ app.post("/submit-feedback", async (req,res) => {
             subject: `New Feedback for VYNYL`,
             text: `
             You received feedback:
-            Message: ${feedback}
             Email: ${email}
+            Message: ${feedback}
             `,
         };
 
