@@ -6,14 +6,15 @@ import userEvent from "@testing-library/user-event";
 import Navbar from "./Navbar";
 import { AuthContext, AuthState } from "../../contexts/AuthContext/AuthContext";
 
-// Mock the auth context
-const mockAuthContextValue: AuthState = {
-    isAuthenticated: false,
-    username: null,
-    email: null,
-}
 
 describe("Navbar component - Unauthenticated", () => {
+   
+    // Mock the auth context
+    const mockAuthContextValue: AuthState = {
+        isAuthenticated: false,
+        username: null,
+        email: null,
+    }
 
     const oldWindowLocation = window.location;
     const replaceSpy = vi.fn();
@@ -55,7 +56,7 @@ describe("Navbar component - Unauthenticated", () => {
 
         // Click Login Button
         const loginButton = await screen.findByText(/Login/i);
-        user.click(loginButton)
+        await user.click(loginButton)
 
         // Check if window.location.replace was called with the correct URL
         expect(replaceSpy).toHaveBeenCalledWith(

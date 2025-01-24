@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import "@testing-library/jest-dom";
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import AlbumInfo from "./AlbumInfo";
 import { AuthProvider } from "../../contexts/AuthContext/AuthContext"; 
 import { AlbumProvider } from "../../contexts/AlbumContext/AlbumContext"; 
@@ -15,8 +15,18 @@ describe("AlbumInfo component", () => {
         description: "A great album",
       };
 
-    it("renders album + artist name from params", async () => {
-        render(
+    // Add timeout for async operations
+    vi.setConfig({ testTimeout: 10000 });
+
+    // Consider using a beforeEach to reset providers
+    beforeEach(() => {
+        // Reset any global state or mocks
+        vi.clearAllMocks();
+    });
+
+    // Use a wrapper to ensure consistent rendering
+    const renderComponent = () => {
+        return render(
             <MemoryRouter initialEntries={[`/album-info/${encodeURIComponent(mockAlbum.artist)}/${encodeURIComponent(mockAlbum.title)}`]}>
                 <AuthProvider>
                     <AlbumProvider>
@@ -27,6 +37,10 @@ describe("AlbumInfo component", () => {
                 </AuthProvider>
             </MemoryRouter>
         );
+    };
+
+    it("renders album + artist name from params", async () => {
+        renderComponent()
 
         const title = await screen.findByRole('heading', { name: /Discovery/i})
         const artist = await screen.findByRole('link',{ name : /Daft Punk/i})
@@ -36,35 +50,16 @@ describe("AlbumInfo component", () => {
     });
 
     it("renders an album description", async () => {
-        render(
-            <MemoryRouter initialEntries={[`/album-info/${encodeURIComponent(mockAlbum.artist)}/${encodeURIComponent(mockAlbum.title)}`]}>
-                <AuthProvider>
-                    <AlbumProvider>
-                        <Routes>
-                            <Route path="/album-info/:artistName/:albumName" element={<AlbumInfo/>}></Route>
-                        </Routes>
-                    </AlbumProvider>
-                </AuthProvider>
-            </MemoryRouter>
-        )
+        renderComponent()
 
         const description = await screen.findByTestId('description')
         expect(description).toBeInTheDocument();
     });
 
     it("Link is to the correct Last.fm details page", async () => {
-        render(
-            <MemoryRouter initialEntries={[`/album-info/${encodeURIComponent(mockAlbum.artist)}/${encodeURIComponent(mockAlbum.title)}`]}>
-                <AuthProvider>
-                    <AlbumProvider>
-                        <Routes>
-                            <Route path="/album-info/:artistName/:albumName" element={<AlbumInfo/>}></Route>
-                        </Routes>
-                    </AlbumProvider>
-                </AuthProvider>
-            </MemoryRouter>
-        );
+        renderComponent()
 
+        // screen.debug()
         const link = await screen.findByTestId("more-info")
         expect (link).toHaveAttribute("href", `https://www.last.fm/music/${mockAlbum.artist.replace(/ /g, '+')}/${encodeURIComponent(mockAlbum.title)}`)
     })
@@ -115,7 +110,6 @@ describe("AlbumInfo component", () => {
 
     //     // Click the button to toggle bookmark
     //     userEvent.click(button);
-
 
     // })
 })

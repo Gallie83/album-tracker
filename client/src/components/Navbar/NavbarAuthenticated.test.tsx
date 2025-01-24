@@ -5,18 +5,19 @@ import { describe, it, expect, vi } from 'vitest';
 import userEvent from "@testing-library/user-event";
 import Navbar from "./Navbar";
 
-// Mock the auth context
-vi.mock('../../contexts/AuthContext/useAuth', () => ({
-    useAuth: () => ({
-        isAuthenticated: true,
-        username: 'TestUser',
-        logout: () => {
-            window.location.href = 'http://localhost:5000/logout';
-          }
-    })
-}));
 
 describe("Navbar component - Authenticated", () => {
+    
+    // Mock the auth context
+    vi.mock('../../contexts/AuthContext/useAuth', () => ({
+        useAuth: () => ({
+            isAuthenticated: true,
+            username: 'TestUser',
+            logout: () => {
+                window.location.href = 'http://localhost:5000/logout';
+              }
+        })
+    }));
 
     it("opens and closes the navbar when VYNYL icon is clicked", async () => {
         const user = userEvent.setup()
@@ -35,7 +36,6 @@ describe("Navbar component - Authenticated", () => {
         
         // Check if it closes on second click
         await user.click(button);
-        
         expect(nav).not.toBeInTheDocument()
     })
 
