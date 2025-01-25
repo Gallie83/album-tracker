@@ -41,8 +41,6 @@ function Navbar() {
     } else {
       setIsCreateGroupModalOpen(true);
     }
-
-
   }
 
   return (
@@ -78,7 +76,7 @@ function Navbar() {
                 </>
               ) : (
                 <a onClick={handleLogin}>Login</a>
-                )}
+              )}
             <li>
               <button onClick={openNewGroupModal}>
                 New Group
@@ -92,11 +90,12 @@ function Navbar() {
           </ul>
         </div>
       )}
+
       {/* Submit feedback modal */}
       {isFeedbackModalOpen && <FeedbackFormModal onClose={() => setIsFeedbackModalOpen(false)}/>}
 
       {/* Create New Group modal */}
-      {isCreateGroupModalOpen && <CreateGroupModal onClose={() => setIsFeedbackModalOpen(false)}/>}
+      {isCreateGroupModalOpen && <CreateGroupModal onClose={() => setIsCreateGroupModalOpen(false)}/>}
     </>
   );
 }
