@@ -2,7 +2,8 @@ import { useState } from 'react';
 import VinylImage from './vinyl-image.png';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext/useAuth';
-import FeedbackForm from '../FeedbackForm';
+import FeedbackFormModal from '../modals/FeedbackFormModal';
+import CreateGroupModal from '../modals/CreateGroupModal';
 
 function Navbar() {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
@@ -10,6 +11,7 @@ function Navbar() {
   const {isAuthenticated, username, logout} = useAuth();
 
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState<boolean>(false)
+  const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState<boolean>(false)
 
   const handleLogin = async () => {
     try {
@@ -29,6 +31,19 @@ function Navbar() {
         }
     }
   };
+
+  const openNewGroupModal = () => {
+    if(!isAuthenticated) {
+      if(window.confirm('You need to be logged in. Redirect to login page?')) {
+        handleLogin()
+        return;
+      }
+    } else {
+      setIsCreateGroupModalOpen(true);
+    }
+
+
+  }
 
   return (
     <>
@@ -65,6 +80,11 @@ function Navbar() {
                 <a onClick={handleLogin}>Login</a>
                 )}
             <li>
+              <button onClick={openNewGroupModal}>
+                New Group
+              </button>
+            </li>
+            <li>
               <button onClick={() => setIsFeedbackModalOpen(true)}>
                 Submit Feedback
               </button>
@@ -73,7 +93,10 @@ function Navbar() {
         </div>
       )}
       {/* Submit feedback modal */}
-      {isFeedbackModalOpen && <FeedbackForm onClose={() => setIsFeedbackModalOpen(false)}/>}
+      {isFeedbackModalOpen && <FeedbackFormModal onClose={() => setIsFeedbackModalOpen(false)}/>}
+
+      {/* Create New Group modal */}
+      {isCreateGroupModalOpen && <CreateGroupModal onClose={() => setIsFeedbackModalOpen(false)}/>}
     </>
   );
 }

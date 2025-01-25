@@ -1,7 +1,7 @@
 import { useState } from "react"
 import ReactDOM from "react-dom"
 
-const FeedbackForm = ({onClose}: {onClose: () => void}) => {
+const FeedbackFormModal = ({onClose}: {onClose: () => void}) => {
     const [feedback, setFeedback] = useState<string>("")
     const [email, setEmail] = useState<string>("")
 
@@ -64,8 +64,8 @@ const FeedbackForm = ({onClose}: {onClose: () => void}) => {
                 </div>
             </div>
         </div>,
-    document.getElementById("modal-root")!
+    document.getElementById("feedback-modal-root")!
     )
 }
 
-export default FeedbackForm
+export default FeedbackFormModal
