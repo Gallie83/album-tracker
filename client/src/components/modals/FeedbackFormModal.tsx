@@ -20,13 +20,12 @@ const FeedbackFormModal = ({onClose}: {onClose: () => void}) => {
                 throw new Error(`Error: ${response.status}`)
             }
 
-            console.log("FEEDBACK feedback",feedback)
             alert('Thank you for your feedback!')
             setFeedback("");
             setEmail("");
             onClose()
         } catch (error) {
-        console.error("Error sending feedback:",error)
+        console.error("Error sending feedback:", error)
         }
     }
 

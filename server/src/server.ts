@@ -3,6 +3,7 @@ import cors from 'cors';
 import mongoose, { models } from 'mongoose';
 import dotenv from 'dotenv';
 import { User } from '../models/User';
+import { Group } from '../models/Group'
 // AWS Cognito import
 import session from 'express-session';
 import { Issuer, generators, Client } from 'openid-client';
@@ -351,12 +352,38 @@ app.put('/update-rating', checkAuth, async (req,res) => {
     }
 })
 
+// Route to create a new listening group
+app.post('/create-group', async(req,res) => {
+    const typedReq = req as AuthenticatedRequest;
+
+    const { groupName, description, isPrivate } = typedReq.body;
+    console.log("NEW GROUP DETAILS:", typedReq.body)
+
+    try {
+        const newGroup = new Group({
+            title: groupName,
+            description: description,
+            private: isPrivate,
+            members: [],
+            albums: [],
+        });
+
+        await newGroup.save()
+
+        res.status(201).json({message: 'Group created!', group: newGroup});
+    } catch (error) {
+        console.error('Error creating group:', error);
+        res.status(500).json({ 
+            message: 'Error creating group:', error
+        });
+    }
+})
+
 // Send email with feedback from users
 app.post("/submit-feedback", async (req,res) => {
     const typedReq = req as AuthenticatedRequest;
 
     const { feedback, email } = typedReq.body;
-    console.log("FEEDBACK RECEIVED:", feedback)
 
     try { 
         // Configure the transporter

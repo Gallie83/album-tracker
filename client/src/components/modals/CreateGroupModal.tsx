@@ -7,6 +7,29 @@ const CreateGroupModal = ({onClose}: {onClose: () => void}) => {
     const [description , setDescription] = useState<string>("");
     const [isPrivate , setIsPrivate] = useState<boolean>(true);
 
+    const createNewGroup = async() => {
+        try {
+            const response = await fetch("http://localhost:5000/create-group", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ groupName, description, isPrivate })
+            });
+
+            if(!response.ok) {
+                throw new Error(`Error: ${response.status}`)
+            }
+
+            alert(`${groupName} created!`)
+            setGroupName("");
+            setDescription("");
+            setIsPrivate(true);
+        } catch (error) {
+            console.error("Error creating group:", error)
+        }
+    }
+
     return ReactDOM.createPortal(
         <div className="fixed inset-0 flex min-h-screen items-center justify-center bg-black/50 z-50">
             <div className="w-full max-w-sm">
@@ -67,7 +90,7 @@ const CreateGroupModal = ({onClose}: {onClose: () => void}) => {
                                 </label>
                             </div>
                         </div>
-                        <button className="w-full rounded-lg bg-gray-900 py-2.5 text-sm font-medium text-white transition duration-300 hover:bg-gray-800">Submit</button>
+                        <button onClick={createNewGroup} className="w-full rounded-lg bg-gray-900 py-2.5 text-sm font-medium text-white transition duration-300 hover:bg-gray-800">Create</button>
                     </div>
                 </div>
             </div>
