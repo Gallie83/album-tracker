@@ -3,10 +3,11 @@ import Navbar from './Navbar/Navbar'
 import Searchbar from './Searchbar'
 import CreateGroupModal from './modals/CreateGroupModal'
 import { useAuth } from '../contexts/AuthContext/useAuth';
+import { handleLogin } from '../utils/authUtils';
 
 function Groups() {
 
-      const {isAuthenticated } = useAuth();
+      const { isAuthenticated } = useAuth();
     const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState<boolean>(false)
 
     const openNewGroupModal = () => {
@@ -39,7 +40,3 @@ function Groups() {
 }
 
 export default Groups
-
-function handleLogin() {
-    throw new Error('Function not implemented.');
-}

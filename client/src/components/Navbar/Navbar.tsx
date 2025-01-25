@@ -3,6 +3,7 @@ import VinylImage from './vinyl-image.png';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext/useAuth';
 import FeedbackFormModal from '../modals/FeedbackFormModal';
+import { handleLogin } from '../../utils/authUtils';
 
 function Navbar() {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
@@ -10,15 +11,6 @@ function Navbar() {
   const {isAuthenticated, username, logout} = useAuth();
 
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState<boolean>(false)
-
-  const handleLogin = async () => {
-    try {
-        const returnUrl = window.location.pathname;
-        window.location.replace(`http://localhost:5000/login?returnUrl=${returnUrl}`);
-    } catch (error) {
-        console.error('Login failed:', error);
-    }
-  };
 
   // Calls logout function from AuthContext
   const handleLogout = () => {
