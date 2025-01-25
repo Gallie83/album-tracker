@@ -21,6 +21,8 @@ const FeedbackFormModal = ({onClose}: {onClose: () => void}) => {
             }
 
             alert('Thank you for your feedback!')
+
+            // Reset State variables and close modal
             setFeedback("");
             setEmail("");
             onClose()

@@ -22,9 +22,12 @@ const CreateGroupModal = ({onClose}: {onClose: () => void}) => {
             }
 
             alert(`${groupName} created!`)
+
+            // Reset State variables and close modal
             setGroupName("");
             setDescription("");
             setIsPrivate(true);
+            onClose();
         } catch (error) {
             console.error("Error creating group:", error)
         }

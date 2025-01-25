@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import './index.css'
 import App from './App.tsx'
 import AlbumInfo from './components/AlbumInfo/AlbumInfo.tsx';
+import Groups from './components/Groups.tsx';
 import ArtistInfo from './components/ArtistInfo.tsx';
 import SearchPage from './components/SearchPage.tsx';
 import Profile from './components/Profile.tsx'
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
   {
     path: '/artist-info/:artistName',
     element: <ArtistInfo />
+  },  
+  {
+    path: '/groups',
+    element: <Groups />
   },  
 ]);
 
