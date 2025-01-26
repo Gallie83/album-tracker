@@ -379,6 +379,19 @@ app.post('/create-group', async(req,res) => {
     }
 })
 
+// Route for fetching User's Groups
+app.get('/:cognitoId/groups', async(req, res) => {
+    try {   
+        const {cognitoId} = req.params;
+
+        const userGroups = await Group.find({ members: cognitoId})
+
+        res.status(200).json(userGroups)
+    } catch (error) {
+        console.log("Error fetching users groups:", error);
+    }
+})
+
 // Send email with feedback from users
 app.post("/submit-feedback", async (req,res) => {
     const typedReq = req as AuthenticatedRequest;

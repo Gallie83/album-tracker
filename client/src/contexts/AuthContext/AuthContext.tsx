@@ -4,6 +4,7 @@ interface AuthState {
     isAuthenticated: boolean,
     username: string | null,
     email: string | null,
+    cognitoId: string | null,
     // To handle Login/Logout
     setAuthState?: Dispatch<SetStateAction<AuthState>>,
     logout?: () => void
@@ -17,6 +18,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode}> = ({children})
         isAuthenticated: false,
         username: null,
         email: null,
+        cognitoId: null,
     })
 
     useEffect(() => {
@@ -36,7 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode}> = ({children})
                         setAuthState({
                             isAuthenticated: true,
                             ...data.userInfo,
-                            username: data.userInfo.preferred_username,
+                            username: data.userInfo.preferred_username
                         });
                     } else {
                         // If User not logged in then reset state
@@ -44,6 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode}> = ({children})
                             isAuthenticated: false,
                             username: null,
                             email: null,
+                            cognitoId: null,
                         });
                     }
                 } else {
@@ -52,6 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode}> = ({children})
                         isAuthenticated: false,
                         username: null,
                         email: null,
+                        cognitoId: null,
                     });
                 }
             } catch (error) {
@@ -60,6 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode}> = ({children})
                     isAuthenticated: false,
                     username: null,
                     email: null,
+                    cognitoId: null,
                 });
             }
         };
@@ -74,6 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode}> = ({children})
             isAuthenticated: false,
             username: null,
             email: null,
+            cognitoId: null,
         });
         // Call to servers logout route which will then redirect to homepage
         window.location.href = 'http://localhost:5000/logout'

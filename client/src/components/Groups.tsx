@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Navbar from './Navbar/Navbar'
 import Searchbar from './Searchbar'
 import CreateGroupModal from './modals/CreateGroupModal'
@@ -7,19 +7,48 @@ import { handleLogin } from '../utils/authUtils';
 
 function Groups() {
 
-      const { isAuthenticated } = useAuth();
+    const { isAuthenticated, cognitoId } = useAuth();
+
     const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState<boolean>(false)
+    const [usersGroups, setUsersGroups] = useState([])                                                
 
     const openNewGroupModal = () => {
         if(!isAuthenticated) {
-          if(window.confirm('You need to be logged in. Redirect to login page?')) {
-            handleLogin()
-            return;
-          }
+            if(window.confirm('You need to be logged in. Redirect to login page?')) {
+                handleLogin()
+                return;
+            }
         } else {
           setIsCreateGroupModalOpen(true);
         }
-      }
+    }
+
+    useEffect(() => {
+        const getUsersGroups = async () => {
+            console.log("RUNNING")
+            try {
+                const response = await fetch(`http://localhost:5000/${cognitoId}/groups`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if(!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const groups = await response.json();
+                setUsersGroups(groups);
+                console.log("GROUPS:",usersGroups)
+            } catch (error) {
+                console.error('Faled to fetch users groups:', error);
+            }
+        }
+
+        getUsersGroups();
+    }, [cognitoId, usersGroups])
+
 
   return (
     <>
@@ -28,9 +57,12 @@ function Groups() {
         </div>
 
         <Searchbar/>
+
         <div>Groups</div>
 
         <button onClick={openNewGroupModal}>Create New Group</button>
+
+        <h3>Your groups</h3>
 
         
       {/* Create New Group modal */}
