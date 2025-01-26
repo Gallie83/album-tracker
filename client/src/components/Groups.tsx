@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Navbar from './Navbar/Navbar'
 import Searchbar from './Searchbar'
 import CreateGroupModal from './modals/CreateGroupModal'
@@ -23,11 +23,10 @@ function Groups() {
         }
     }
 
-    useEffect(() => {
-        const getUsersGroups = async () => {
-            console.log("RUNNING")
-            console.log("ID:" ,cognitoId)
-            if(!isAuthenticated) {return;}
+    const getUsersGroups = useCallback(async () => {
+        console.log("RUNNING")
+        console.log("ID:" ,cognitoId)
+        if(!isAuthenticated) {return;}
             try {
                 const response = await fetch(`http://localhost:5000/${cognitoId}/groups`, {
                     method: 'GET',
@@ -42,14 +41,18 @@ function Groups() {
                 
                 const groups = await response.json();
                 setUsersGroups(groups);
-                console.log("GROUPS:",usersGroups)
             } catch (error) {
                 console.error('Faled to fetch users groups:', error);
             }
-        }
-
+        }, [cognitoId, isAuthenticated]);
+        
+    useEffect(() => {
         getUsersGroups();
-    }, [cognitoId, usersGroups])
+    }, [getUsersGroups])
+    
+    useEffect(() => {
+        console.log("GROUPS:", usersGroups)
+    }, [usersGroups])
 
 
   return (
