@@ -26,6 +26,7 @@ function Groups() {
     useEffect(() => {
         const getUsersGroups = async () => {
             console.log("RUNNING")
+            console.log("ID:" ,cognitoId)
             try {
                 const response = await fetch(`http://localhost:5000/${cognitoId}/groups`, {
                     method: 'GET',

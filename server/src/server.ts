@@ -384,6 +384,11 @@ app.get('/:cognitoId/groups', async(req, res) => {
     try {   
         const {cognitoId} = req.params;
 
+        // if (!cognitoId) {
+        //     res.status(400).json({ message: 'No user ID provided' });
+        //     return;
+        // }
+
         const userGroups = await Group.find({ members: cognitoId})
 
         res.status(200).json(userGroups)

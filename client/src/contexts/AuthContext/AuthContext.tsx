@@ -38,7 +38,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode}> = ({children})
                         setAuthState({
                             isAuthenticated: true,
                             ...data.userInfo,
-                            username: data.userInfo.preferred_username
+                            username: data.userInfo.preferred_username,
+                            cognitoId: data.userInfo.sub
                         });
                     } else {
                         // If User not logged in then reset state
