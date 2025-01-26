@@ -27,6 +27,7 @@ function Groups() {
         const getUsersGroups = async () => {
             console.log("RUNNING")
             console.log("ID:" ,cognitoId)
+            if(!isAuthenticated) {return;}
             try {
                 const response = await fetch(`http://localhost:5000/${cognitoId}/groups`, {
                     method: 'GET',

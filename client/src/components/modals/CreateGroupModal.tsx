@@ -1,7 +1,10 @@
 import { useState } from "react"
 import ReactDOM from "react-dom"
+import { useAuth } from "../../contexts/AuthContext/useAuth";
 
 const CreateGroupModal = ({onClose}: {onClose: () => void}) => {
+
+    const { cognitoId } = useAuth();
 
     const [groupName , setGroupName] = useState<string>("");
     const [description , setDescription] = useState<string>("");
@@ -14,7 +17,7 @@ const CreateGroupModal = ({onClose}: {onClose: () => void}) => {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ groupName, description, isPrivate })
+                body: JSON.stringify({ groupName, description, isPrivate, cognitoId })
             });
 
             if(!response.ok) {

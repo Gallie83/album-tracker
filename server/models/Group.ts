@@ -14,7 +14,7 @@ const GroupSchema = new mongoose.Schema({
         required: true,
     },
     members: [{ 
-        type: mongoose.Schema.Types.ObjectId, 
+        type: String, 
         ref: 'User'
     }],
     albums: [

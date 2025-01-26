@@ -356,15 +356,16 @@ app.put('/update-rating', checkAuth, async (req,res) => {
 app.post('/create-group', async(req,res) => {
     const typedReq = req as AuthenticatedRequest;
 
-    const { groupName, description, isPrivate } = typedReq.body;
+    const { groupName, description, isPrivate, cognitoId } = typedReq.body;
     console.log("NEW GROUP DETAILS:", typedReq.body)
 
     try {
+        // Create Group with users cognitoId as first member Id
         const newGroup = new Group({
             title: groupName,
             description: description,
             private: isPrivate,
-            members: [],
+            members: [cognitoId],
             albums: [],
         });
 
