@@ -10,6 +10,7 @@ import SearchPage from './components/SearchPage.tsx';
 import Profile from './components/Profile.tsx'
 import { AuthProvider } from './contexts/AuthContext/AuthContext.tsx';
 import { AlbumProvider } from './contexts/AlbumContext/AlbumContext.tsx';
+import { GroupProvider } from './contexts/GroupContext/GroupContext.tsx';
 
 const router = createBrowserRouter([
   {
@@ -42,7 +43,9 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthProvider>
       <AlbumProvider>
-        <RouterProvider router={router} />
+        <GroupProvider>
+          <RouterProvider router={router} />
+        </GroupProvider>
       </AlbumProvider>
     </AuthProvider>
   </StrictMode>,
