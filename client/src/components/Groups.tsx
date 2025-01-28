@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext/useAuth';
 import { handleLogin } from '../utils/authUtils';
 
 interface Group {
+    id: string,
     title: string,
     description: string,
     private: boolean,
@@ -77,7 +78,22 @@ function Groups() {
 
         <h3>Your groups</h3>
 
-        {usersGroups ? (usersGroups.map((group) => (<p>{group.title}</p>))) : (<p>No groups yet</p>)}
+        {usersGroups ? (
+            usersGroups.map((group) => (
+                <div className='bg-white text-black flex-col'>
+                                  <div
+                                    className="bg-slate-500 px-3 py-2 mx-3 my-2 rounded-lg"
+                                    key={group.id}
+                                  >
+                                    <div className='mt-3'>
+                                    <h2 className="font-bold text-ellipsis overflow-hidden line-clamp-2">{group.title}</h2>
+                                    <p className='text-ellipsis overflow-hidden line-clamp-1'>{group.description}</p>
+                                    </div>
+                                  </div>
+                </div>
+                ))) : (
+                <p>No groups yet</p>
+                )}
 
         
       {/* Create New Group modal */}
