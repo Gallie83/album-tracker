@@ -68,22 +68,22 @@ function SearchPage() {
     <Searchbar/>
     {/* Check if searchResults exists and then map through releases */}
     {searchResults?.results ? (
-  // Display search results in a grid
-  <div className="grid grid-cols-4 gap-5">
-    {searchResults.results.map((album) => (
+      // Display search results in a grid
+      <div className="grid grid-cols-4 gap-5">
+        {searchResults.results.map((album) => (
 
-      // TODO: handle special characters before directing users to next page
-      <Link
-        to={`/album-info/${encodeURIComponent(album.artist)}/${encodeURIComponent(album.title)}`}
-        className="bg-slate-500 p-5 m-5 rounded-lg"
-        key={album.id}
-      >
-        <img className="size-72" src={album.imageUrl} alt="Album art" />
-        <h2 className="font-bold">{album.title}</h2>
-        <p>Artist: {album.artist}</p>
-      </Link>
-    ))}
-  </div>
+          // TODO: handle special characters before directing users to next page
+          <Link
+            to={`/album-info/${encodeURIComponent(album.artist)}/${encodeURIComponent(album.title)}`}
+            className="bg-slate-500 p-5 m-5 rounded-lg"
+            key={album.id}
+          >
+            <img className="size-72" src={album.imageUrl} alt="Album art" />
+            <h2 className="font-bold">{album.title}</h2>
+            <p>Artist: {album.artist}</p>
+          </Link>
+        ))}
+      </div>
 ) : ( <p>Nothing</p> )}
 
     </>

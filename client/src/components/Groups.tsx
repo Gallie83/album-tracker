@@ -5,14 +5,22 @@ import CreateGroupModal from './modals/CreateGroupModal'
 import { useAuth } from '../contexts/AuthContext/useAuth';
 import { handleLogin } from '../utils/authUtils';
 
+interface Group {
+    title: string,
+    description: string,
+    private: boolean,
+    members: [],
+    albums: []
+}
+
 function Groups() {
 
     const { isAuthenticated, cognitoId } = useAuth();
 
     const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState<boolean>(false)
-    const [usersGroups, setUsersGroups] = useState([])                                                
+    const [usersGroups, setUsersGroups] = useState<Group[]>([])                                                
 
-    const openNewGroupModal = () => {
+    const openCreateGroupModal = () => {
         if(!isAuthenticated) {
             if(window.confirm('You need to be logged in. Redirect to login page?')) {
                 handleLogin()
@@ -65,9 +73,11 @@ function Groups() {
 
         <div>Groups</div>
 
-        <button onClick={openNewGroupModal}>Create New Group</button>
+        <button onClick={openCreateGroupModal}>Create New Group</button>
 
         <h3>Your groups</h3>
+
+        {usersGroups ? (usersGroups.map((group) => (<p>{group.title}</p>))) : (<p>No groups yet</p>)}
 
         
       {/* Create New Group modal */}
