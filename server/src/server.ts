@@ -357,7 +357,6 @@ app.post('/create-group', async(req,res) => {
     const typedReq = req as AuthenticatedRequest;
 
     const { groupName, description, isPrivate, cognitoId } = typedReq.body;
-    console.log("NEW GROUP DETAILS:", typedReq.body)
 
     try {
         // Create Group with users cognitoId as first member Id
@@ -395,6 +394,41 @@ app.get('/:cognitoId/groups', async(req, res) => {
         res.status(200).json(userGroups)
     } catch (error) {
         console.log("Error fetching users groups:", error);
+    }
+})
+
+// Route for adding an album to a users group
+app.post('/groups/add-album/:groupId', async(req,res) => {
+    const { groupId } = req.params;
+    const { title, artist, id } = req.body;
+
+    try{
+        // Find Group by it's Id 
+        const group = await Group.findById(groupId);
+        if(!group) {
+            res.status(404).json({ message: 'Group not found'})
+            return;
+        }
+        
+        // Create new album object
+        const album = {
+            title,
+            artist,
+            id,
+            ratings: [],
+            dateListened: null,
+        }
+
+        // Add album to group.albums and save group
+        group.albums.push(album);
+        await group.save();
+
+        res.status(200).json({ message: 'Album added to ${group.title}'})
+    } catch (error) {
+        console.error('Error adding album to group:', error);
+        res.status(500).json({ 
+            message: 'Error adding album to group:', error
+        });
     }
 })
 
