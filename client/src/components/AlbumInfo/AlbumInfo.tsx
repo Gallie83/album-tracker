@@ -5,6 +5,7 @@ import Searchbar from "../Searchbar";
 import RatingModal from "../modals/RatingModal";
 import { useAuth } from "../../contexts/AuthContext/useAuth";
 import { useAlbumContext } from "../../contexts/AlbumContext/useAlbumContext";
+import { useGroupContext } from "../../contexts/GroupContext/useGroupContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookmark } from '@fortawesome/free-solid-svg-icons';
 
@@ -30,8 +31,11 @@ function AlbumInfo() {
   const [isSaved, setIsSaved] = useState<boolean>(false)
   const [updatingRating, setUpdatingRating] = useState<boolean>(false)
 
+  const [showGroupDropdown, setShowGroupDropdown] = useState(false)
+
   const { isAuthenticated } = useAuth();
   const { usersAlbums, setUsersAlbums, savedAlbums, setSavedAlbums} = useAlbumContext();
+  const { usersGroups } = useGroupContext();
 
   // Hash albums name+artist to use as ID, as mbid missing from majority of albums
   const generateId = (albumName: string, artistName: string) => {
@@ -178,6 +182,28 @@ function AlbumInfo() {
     }
   }
 
+  const addToGroup = async ( groupId:string, title: string, artist: string, albumId: string ) => {
+    console.log(usersGroups)
+    console.log("Sending req body:" , groupId, title, artist, albumId )
+    try {
+      const response = await fetch(`http://localhost:5000/groups/add-album/${groupId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({title, artist, albumId}),
+      });
+
+      if(!response.ok) {
+        throw new Error(`Error adding to group: ${response.status}`)
+      }
+    } catch (error) {
+      console.error('Error adding album to group:', error)
+    }
+
+  }
+
   // Receives rating from RatingModal(or as null if user decided to skip)
   const handleRating = (rating: number | null) => {
     console.log("Value received:", rating)
@@ -283,13 +309,45 @@ function AlbumInfo() {
             {/* Right Section with Summary */}
             <div className="w-3/5 bg-green-300 flex flex-col justify-between p-6 px-16 leading-normal">
 
-            {/* Opens RatingModal */}
               <div>
+            {/* Opens RatingModal */}
                 <button 
                   onClick={() => openRatingModal(album.hashId)}
                   data-testid="toggleModalButton">
                     Add
                 </button>
+                <br />
+
+                <div className="relative inline-block text-left">
+                  <div>
+                    <button onClick={() => setShowGroupDropdown(!showGroupDropdown)} type="button" className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50" >
+                      Add to Group
+                      <svg className="-mr-1 size-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+                        <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                      </svg>
+                    </button>
+
+                  { showGroupDropdown && (
+                    <div className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white ring-1 shadow-lg ring-black/5 focus:outline-hidden" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1}>
+                      <div className="py-1" role="none">
+                      {usersGroups ? (
+                        usersGroups.map((group: { id: string; title: string;}) => (
+                          <button 
+                            key={group.id} 
+                            onClick={() => addToGroup(group.id, album.title, album.artist, album.hashId)} 
+                            className="block px-4 py-2 text-sm text-gray-700">
+                              {group.title}
+                          </button>
+                        ))) : (
+                          <p>No groups yet</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  </div>
+                </div>
+
                 <br />
 
                 {/* Bookmark Icon */}
