@@ -400,7 +400,7 @@ app.get('/:cognitoId/groups', async(req, res) => {
 // Route for adding an album to a users group
 app.post('/groups/add-album/:groupId', async(req,res) => {
     const { groupId } = req.params;
-    const { title, artist, albumId } = req.body;
+    const { title, artist, hashId } = req.body;
 
     try{
         // Find Group by it's Id 
@@ -414,7 +414,7 @@ app.post('/groups/add-album/:groupId', async(req,res) => {
         const album = {
             title,
             artist,
-            id: albumId,
+            hashId,
             ratings: [],
             dateListened: null,
         }
@@ -423,7 +423,7 @@ app.post('/groups/add-album/:groupId', async(req,res) => {
         group.albums.push(album);
         await group.save();
 
-        res.status(200).json({ message: `Album added to ${group.title}`})
+        res.status(200).json(group);
     } catch (error) {
         console.error('Error adding album to group:', error);
         res.status(500).json({ 

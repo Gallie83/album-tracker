@@ -34,7 +34,7 @@ function AlbumInfo() {
 
   const { isAuthenticated } = useAuth();
   const { usersAlbums, setUsersAlbums, savedAlbums, setSavedAlbums} = useAlbumContext();
-  const { usersGroups } = useGroupContext();
+  const { usersGroups, setUsersGroups } = useGroupContext();
 
   // Hash albums name+artist to use as ID, as mbid missing from majority of albums
   const generateId = (albumName: string, artistName: string) => {
@@ -181,29 +181,43 @@ function AlbumInfo() {
     }
   }
 
-  const addToGroup = async ( groupId:string, title: string, artist: string, albumId: string ) => {
-    console.log(usersGroups)
-    console.log("Sending req body:" , groupId, title, artist, albumId )
-
-    // TODO: add a check to see if album already exists in group before sending POST request
-
+  const addToGroup = async ( groupId:string, title: string, artist: string, hashId: string ) => {
     try {
+      // Check group exists
+      const group = usersGroups!.find((group) => group._id === groupId);
+      if(!group) {
+        throw new Error('Group not found')
+      }
+
+      // Check if album already exists in group
+      const albumExists = group.albums.some((album: {hashId: string}) => album?.hashId === hashId);
+      if(albumExists) {
+        throw new Error('Album already exists in this group')
+      }
+
       const response = await fetch(`http://localhost:5000/groups/add-album/${groupId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({title, artist, albumId}),
+        body: JSON.stringify({title, artist, hashId}),
       });
 
       if(!response.ok) {
         throw new Error(`Error: ${response.status}`)
       }
 
-      const data = await response.json()
+      const updatedGroup = await response.json();
 
-      console.log(data)
+      // Update state in GroupContext once response is okay
+      setUsersGroups(prevGroups => {
+        // Handle null/undefined case by returning initial state
+        if (!prevGroups) return [updatedGroup];
+        
+        return prevGroups.map(group => 
+        group._id === groupId ? updatedGroup : group
+      )});
 
     } catch (error) {
       console.error('Error adding album to group:', error)
@@ -343,7 +357,7 @@ function AlbumInfo() {
                             </button>
                           ))
                         ) : (
-                          <p>No groups yet</p>
+                          <p className="text-black">No groups yet</p>
                         )
                       ) : (
                         <div className="text-black p-3">
