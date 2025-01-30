@@ -27,7 +27,7 @@ const GroupSchema = new mongoose.Schema({
                 type: String,
                 required: true
             },
-            id: {
+            hashId: {
                 type: String,
                 required: true
             },

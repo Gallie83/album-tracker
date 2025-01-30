@@ -1,8 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom"
-import Navbar from "../Navbar/Navbar";
-import Searchbar from "../Searchbar";
-import RatingModal from "../modals/RatingModal";
+import RatingModal from "../../components/modals/RatingModal";
 import { useAuth } from "../../contexts/AuthContext/useAuth";
 import { useAlbumContext } from "../../contexts/AlbumContext/useAlbumContext";
 import { useGroupContext } from "../../contexts/GroupContext/useGroupContext";
@@ -186,6 +184,9 @@ function AlbumInfo() {
   const addToGroup = async ( groupId:string, title: string, artist: string, albumId: string ) => {
     console.log(usersGroups)
     console.log("Sending req body:" , groupId, title, artist, albumId )
+
+    // TODO: add a check to see if album already exists in group before sending POST request
+
     try {
       const response = await fetch(`http://localhost:5000/groups/add-album/${groupId}`, {
         method: 'POST',
@@ -243,12 +244,6 @@ function AlbumInfo() {
       
   return(
     <>
-      <div className="flex fixed top-0 left-0 ml-3 mt-3">
-
-      <Navbar />
-      </div>
-
-      <Searchbar/>
       {album ? (
         // Outer div
         <div className="flex items-center justify-center h-screen">

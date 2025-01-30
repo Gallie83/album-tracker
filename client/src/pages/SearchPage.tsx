@@ -2,9 +2,6 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
-import Searchbar from './Searchbar';
-import Navbar from './Navbar/Navbar';
-
 const apiKey = import.meta.env.VITE_APP_API_KEY;
 
 // Interfaces
@@ -60,12 +57,6 @@ function SearchPage() {
 
   return (
     <>
-    <div className="flex fixed top-0 left-0 ml-3 mt-3">
-
-    <Navbar />
-    </div>
-
-    <Searchbar/>
     {/* Check if searchResults exists and then map through releases */}
     {searchResults?.results ? (
       // Display search results in a grid

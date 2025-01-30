@@ -1,7 +1,5 @@
 import { useState } from 'react'
-import Navbar from './Navbar/Navbar'
-import Searchbar from './Searchbar'
-import CreateGroupModal from './modals/CreateGroupModal'
+import CreateGroupModal from '../components/modals/CreateGroupModal'
 import { useAuth } from '../contexts/AuthContext/useAuth';
 import { handleLogin } from '../utils/authUtils';
 import { useGroupContext } from '../contexts/GroupContext/useGroupContext';
@@ -26,24 +24,18 @@ function Groups() {
 
   return (
     <>
-        <div className="flex fixed top-0 left-0 ml-3 mt-3">
-            <Navbar />
-        </div>
-
-        <Searchbar/>
-
-        <div>Groups</div>
+        <h1>Groups</h1>
 
         <button onClick={openCreateGroupModal}>Create New Group</button>
 
         <h3>Your groups</h3>
 
         {usersGroups ? (
-            usersGroups.map((group: { id: string; title: string; description: string;}) => (
+            usersGroups.map((group: { _id: string; title: string; description: string;}) => (
                 <div className='bg-white text-black flex-col'>
                                   <div
                                     className="bg-slate-500 px-3 py-2 mx-3 my-2 rounded-lg"
-                                    key={group.id}
+                                    key={group._id}
                                   >
                                     <div className='mt-3'>
                                     <h2 className="font-bold text-ellipsis overflow-hidden line-clamp-2">{group.title}</h2>
