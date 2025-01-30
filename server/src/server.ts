@@ -423,7 +423,7 @@ app.post('/groups/add-album/:groupId', async(req,res) => {
         group.albums.push(album);
         await group.save();
 
-        res.status(200).json({ message: 'Album added to ${group.title}'})
+        res.status(200).json({ message: `Album added to ${group.title}`})
     } catch (error) {
         console.error('Error adding album to group:', error);
         res.status(500).json({ 

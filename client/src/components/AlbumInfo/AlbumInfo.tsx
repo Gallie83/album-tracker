@@ -8,6 +8,7 @@ import { useAlbumContext } from "../../contexts/AlbumContext/useAlbumContext";
 import { useGroupContext } from "../../contexts/GroupContext/useGroupContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookmark } from '@fortawesome/free-solid-svg-icons';
+import { handleLogin } from "../../utils/authUtils";
 
 const apiKey = import.meta.env.VITE_APP_API_KEY;
 
@@ -196,8 +197,13 @@ function AlbumInfo() {
       });
 
       if(!response.ok) {
-        throw new Error(`Error adding to group: ${response.status}`)
+        throw new Error(`Error: ${response.status}`)
       }
+
+      const data = await response.json()
+
+      console.log(data)
+
     } catch (error) {
       console.error('Error adding album to group:', error)
     }
@@ -323,24 +329,32 @@ function AlbumInfo() {
                     <button onClick={() => setShowGroupDropdown(!showGroupDropdown)} type="button" className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50" >
                       Add to Group
                       <svg className="-mr-1 size-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
-                        <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                        <path fillRule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
                       </svg>
                     </button>
 
                   { showGroupDropdown && (
                     <div className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white ring-1 shadow-lg ring-black/5 focus:outline-hidden" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1}>
                       <div className="py-1" role="none">
-                      {usersGroups ? (
-                        usersGroups.map((group: { id: string; title: string;}) => (
-                          <button 
-                            key={group.id} 
-                            onClick={() => addToGroup(group.id, album.title, album.artist, album.hashId)} 
-                            className="block px-4 py-2 text-sm text-gray-700">
+                      {isAuthenticated ? (
+                        usersGroups ? (
+                          usersGroups.map((group: { _id: string; title: string }) => (
+                            <button
+                              key={group._id}
+                              onClick={() => addToGroup(group._id, album.title, album.artist, album.hashId)}
+                              className="block px-4 py-2 text-sm text-gray-700"
+                            >
                               {group.title}
-                          </button>
-                        ))) : (
+                            </button>
+                          ))
+                        ) : (
                           <p>No groups yet</p>
-                        )}
+                        )
+                      ) : (
+                        <div className="text-black p-3">
+                          <p><button onClick={handleLogin} className="text-blue-700">Login</button> to access group features</p>
+                          </div>
+                      )}
                       </div>
                     </div>
                   )}

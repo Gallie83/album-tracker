@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect, useContext } from "react";
 import { AuthContext } from "../AuthContext/AuthContext";
 
 interface Group {
-    id: string,
+    _id: string,
     title: string,
     description: string,
     private: boolean,
