@@ -7,7 +7,7 @@ import { useGroupContext } from "../../contexts/GroupContext/useGroupContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookmark } from '@fortawesome/free-solid-svg-icons';
 import { handleLogin } from "../../utils/authUtils";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 const apiKey = import.meta.env.VITE_APP_API_KEY;
 
@@ -73,7 +73,7 @@ function AlbumInfo() {
     try {
       const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=album.getInfo&api_key=${apiKey}&artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&format=json`);
       const data = await response.json()
-      console.log("ALBUM DATA:", data)
+
       if (data.album) {
         // Check if tracklist is an array/single object
         const tracks = Array.isArray(data.album.tracks.track)
@@ -120,7 +120,6 @@ function AlbumInfo() {
   const addToUsersAlbums = async (hashId: string, title: string, artist: string, rating: number | null) => {
     try {
       const albumData = {albumId: hashId, title, artist, rating};
-      console.log(albumData)
 
       // Save album if new, update rating if existing
       const route = updatingRating ? 'update-rating' : 'save-album'; 
@@ -138,24 +137,29 @@ function AlbumInfo() {
         throw new Error(`Error: ${response.status}`)
       }
 
-    // Update albums in context after they're added
+    // Update albums in context after they're added with success toast
     if (rating === 0) {
       setSavedAlbums((prev) => [
         ...(prev?.filter((album) => album.id !== hashId) || []),
         { ...albumData, id: albumData.albumId }, 
       ]);
+      toast.success('Album added to Saved Albums')
     } else {
       setUsersAlbums((prev) => [
         ...(prev?.filter((album) => album.id !== hashId) || []),
         { ...albumData, id: albumData.albumId }, 
       ]);
+      toast.success('Album added to MyAlbums')
     }
 
-      const data = await response.json();
-
-      console.log('Data:', data)
     } catch (error) {
-      console.error('Error adding album to list:', error)
+      let message = 'Failed to add album to list';
+      if(error instanceof Error) {
+        message = error.message;
+      } else if (typeof error === 'string') {
+        message = error
+      }
+      toast.error(message)
     }
   }
 
@@ -182,6 +186,7 @@ function AlbumInfo() {
     }
   }
 
+  // Adds album to a group user selects from usersGroups
   const addToGroup = async ( groupId:string, title: string, artist: string, hashId: string ) => {
     try {
       // Check group exists
@@ -193,7 +198,6 @@ function AlbumInfo() {
       // Check if album already exists in group
       const albumExists = group.albums.some((album: {hashId: string}) => album?.hashId === hashId);
       if(albumExists) {
-        toast.error('Album already exists in this group')
         throw new Error('Album already exists in this group')
       }
 
@@ -207,25 +211,28 @@ function AlbumInfo() {
       });
 
       if(!response.ok) {
-        toast.error(`Error: ${response.status}`)
         throw new Error(`Error: ${response.status}`)
       }
 
       const updatedGroup = await response.json();
 
       // Update state in GroupContext once response is okay
-      setUsersGroups(prevGroups => {
-        // Handle null/undefined case by returning initial state
-        if (!prevGroups) return [updatedGroup];
-        
-        return prevGroups.map(group => 
-        group._id === groupId ? updatedGroup : group
-      )});
+      setUsersGroups(prevGroups => 
+        prevGroups ? prevGroups.map(
+          group => group._id === groupId ? updatedGroup : group
+        ) : [updatedGroup]
+      );
 
       toast.success(`Album added to ${updatedGroup.title}`)
 
     } catch (error) {
-      console.error('Error adding album to group:', error)
+      let message = 'Failed to add album to group';
+      if(error instanceof Error) {
+        message = error.message;
+      } else if (typeof error === 'string') {
+        message = error
+      }
+      toast.error(message)
     }
 
   }
@@ -402,10 +409,7 @@ function AlbumInfo() {
             </div>
 
           </div>
-          <Toaster
-          position="top-right"
-          reverseOrder={false}
-          />
+
         </div>
 
       

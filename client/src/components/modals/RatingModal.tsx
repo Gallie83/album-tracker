@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import VinylImage from '../Navbar/vinyl-image.png'
+import toast from "react-hot-toast";
 
 function RatingModal( {onSubmitRating, closeModal }: { onSubmitRating: (rating: number | null) => void; closeModal: () => void } ) {
 
@@ -10,15 +11,11 @@ function RatingModal( {onSubmitRating, closeModal }: { onSubmitRating: (rating: 
   // Pass rating back to AlbumInfo
   const handleSubmit = () => {
     if(!valueIndex) {
-      alert("You have not selected a rating value")
+      toast.error("You have not selected a rating value")
       return
     }
     onSubmitRating(valueIndex+1)
   }
-
-  useEffect(() => {
-    console.log("VALUE:",(valueIndex))
-  }, [valueIndex])
 
   // Pass null as rating for AlbumInfo
   const handleSkip = () => {

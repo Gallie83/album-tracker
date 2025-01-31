@@ -1,6 +1,7 @@
 import { useState } from "react"
 import ReactDOM from "react-dom"
 import { useAuth } from "../../contexts/AuthContext/useAuth";
+import toast from "react-hot-toast";
 
 const CreateGroupModal = ({onClose}: {onClose: () => void}) => {
 
@@ -24,15 +25,22 @@ const CreateGroupModal = ({onClose}: {onClose: () => void}) => {
                 throw new Error(`Error: ${response.status}`)
             }
 
-            alert(`${groupName} created!`)
+            toast.success(`${groupName} created!`)
 
             // Reset State variables and close modal
             setGroupName("");
             setDescription("");
             setIsPrivate(true);
             onClose();
+            
         } catch (error) {
-            console.error("Error creating group:", error)
+            let message = `Failed to create ${groupName}`;
+            if(error instanceof Error) {
+              message = error.message;
+            } else if (typeof error === 'string') {
+              message = error
+            }
+            toast.error(message)
         }
     }
 
