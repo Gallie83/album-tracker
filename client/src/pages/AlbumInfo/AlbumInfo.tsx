@@ -30,12 +30,14 @@ function AlbumInfo() {
   const [open, setOpen] = useState(false);
   const [isSaved, setIsSaved] = useState<boolean>(false)
   const [updatingRating, setUpdatingRating] = useState<boolean>(false)
+  const [showGroupDropdown, setShowGroupDropdown] = useState(false)
 
+  // Modals
   const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  const [showGroupDropdown, setShowGroupDropdown] = useState(false)
 
+  // Contexts
   const { isAuthenticated } = useAuth();
   const { usersAlbums, setUsersAlbums, savedAlbums, setSavedAlbums} = useAlbumContext();
   const { usersGroups, setUsersGroups } = useGroupContext();
@@ -65,9 +67,8 @@ function AlbumInfo() {
       }
       setIsRatingModalOpen(true)
     } else {
-      // Redirect to login
-      const returnUrl = window.location.pathname;
-      window.location.replace(`http://localhost:5000/login?returnUrl=${returnUrl}`);
+      // Open AuthModal
+      setIsAuthModalOpen(true)
     }
   }
   
@@ -265,9 +266,7 @@ function AlbumInfo() {
         }
         setIsSaved(!isSaved);
     } else {
-      // Redirect to login
-      // const returnUrl = window.location.pathname;
-      // window.location.replace(`http://localhost:5000/login?returnUrl=${returnUrl}`);
+      // Open AuthModal
       setIsAuthModalOpen(true)
     }
   }
@@ -286,7 +285,7 @@ function AlbumInfo() {
                           </RatingModal> 
               )}
 
-          {/* Submit feedback modal */}
+          {/* Authentication modal */}
           {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)}/>}
 
 
@@ -376,6 +375,7 @@ function AlbumInfo() {
                             </button>
                           ))
                         ) : (
+                          // TODO: redirect to create group modal if no usersGroups
                           <p className="text-black">No groups yet</p>
                         )
                       ) : (

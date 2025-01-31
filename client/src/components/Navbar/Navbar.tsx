@@ -4,23 +4,19 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext/useAuth';
 import FeedbackFormModal from '../modals/FeedbackFormModal';
 import { handleLogin } from '../../utils/authUtils';
+import AuthModal from '../modals/AuthModal';
 
 function Navbar() {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
-
-  const {isAuthenticated, username, logout} = useAuth();
-
+  // Modals
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState<boolean>(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  // Calls logout function from AuthContext
-  const handleLogout = () => {
-    if(logout) {
-        // Confirmation message before logout
-        if(window.confirm('Are you sure you want to log out?')) {
-            logout();
-        }
-    }
-  };
+
+  // Contexts
+  const {isAuthenticated, username } = useAuth();
+
+
 
   return (
     <>
@@ -49,7 +45,7 @@ function Navbar() {
                     </Link>
                   </li>
                   <li>
-                    <button onClick={handleLogout}>Logout</button>
+                    <button onClick={() => setIsAuthModalOpen(true)}>Logout</button>
                   </li>
                 </>
               ) : (
@@ -72,6 +68,10 @@ function Navbar() {
 
       {/* Submit feedback modal */}
       {isFeedbackModalOpen && <FeedbackFormModal onClose={() => setIsFeedbackModalOpen(false)}/>}
+        
+      {/* Authentication modal */}
+      {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)}/>}
+
     </>
   );
 }

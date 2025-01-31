@@ -1,42 +1,37 @@
 import { useState } from 'react'
 import CreateGroupModal from '../components/modals/CreateGroupModal'
 import { useAuth } from '../contexts/AuthContext/useAuth';
-import { handleLogin } from '../utils/authUtils';
 import { useGroupContext } from '../contexts/GroupContext/useGroupContext';
-import toast from 'react-hot-toast';
+import AuthModal from '../components/modals/AuthModal';
 
 function Groups() {
 
-    const { isAuthenticated } = useAuth();
-    const { usersGroups } = useGroupContext();
+  // Modals
+  const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState<boolean>(false)    
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);                                          
 
-    const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState<boolean>(false)                                              
+  // Contexts
+  const { isAuthenticated } = useAuth();
+  const { usersGroups } = useGroupContext();
 
-    const openCreateGroupModal = () => {
-        if(!isAuthenticated) {
-          console.log("Not logged in");
-          toast((t) => (
-            <div>
-              You need to be logged in. Redirect to login page?
-              <hr />
-              <button onClick={() => handleLogin()}>
-                Login
-              </button>
-              <button onClick={() => toast.dismiss(t.id)}>
-                Dismiss
-              </button>
-            </div>
-          ), { position: 'top-center'});
-        } else {
-          setIsCreateGroupModalOpen(true);
-        }
+
+  const openCreateGroupModal = () => {
+    if(!isAuthenticated) {
+      // Open AuthModal
+      setIsAuthModalOpen(true)
+      } else {
+        setIsCreateGroupModalOpen(true);
     }
+  }
 
   return (
     <>
         <h1>Groups</h1>
 
         <button onClick={openCreateGroupModal}>Create New Group</button>
+
+        {/* Authentication modal */}
+        {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)}/>}
 
         <h3>Your groups</h3>
 

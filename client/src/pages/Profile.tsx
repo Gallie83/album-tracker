@@ -1,9 +1,14 @@
 import { useAuth } from "../contexts/AuthContext/useAuth";
 import { useAlbumContext } from "../contexts/AlbumContext/useAlbumContext";
-import toast from "react-hot-toast";
+import { useState } from "react";
+import AuthModal from "../components/modals/AuthModal";
 
 function Profile() {
-    const { isAuthenticated, username, email, logout} = useAuth();
+      // Modals
+      const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    
+    // Contexts
+    const { isAuthenticated, username, email } = useAuth();
     const { usersAlbums, setUsersAlbums, savedAlbums, setSavedAlbums} = useAlbumContext();
 
     console.log("USER:", isAuthenticated, username, email )
@@ -14,30 +19,6 @@ function Profile() {
             window.location.replace(`http://localhost:5000/login?returnUrl=${returnUrl}`);
         } catch (error) {
             console.error('Login failed:', error);
-        }
-    };
-
-    // Calls logout function from AuthContext
-    const handleLogout = () => {
-        if(logout) {
-            // Confirmation message before logout
-            toast((t) => (
-                <div className="p-4 rounded-lg border border-gray-200 min-w-[300px]">
-                  <p className="text-gray-900 text-sm font-medium mb-2">
-                    Are you sure you want to Logout?
-                  </p>
-                  <hr className="border-t border-gray-200"/>
-                  <button onClick={() => toast.dismiss(t.id)}>
-                    Dismiss
-                  </button>
-                  <button onClick={() => logout()}>
-                    Logout
-                  </button>
-                </div>
-              ), { 
-                position: 'top-center',
-                duration: Infinity
-              });
         }
     };
 
@@ -71,6 +52,10 @@ function Profile() {
     return(
       <>
         <h1>Your Profile</h1>
+
+        {/* Authentication modal */}
+        {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)}/>}
+
         {isAuthenticated ? (
             <div>
                 <h2>Welcome, {username}</h2>
@@ -105,7 +90,7 @@ function Profile() {
                         <p>No albums saved yet</p> 
                         )}
                 </div>
-                <button onClick={handleLogout}>Logout</button>
+                <button onClick={() => setIsAuthModalOpen(true)}>Logout</button>
             </div>
         ) : (
             <div>
