@@ -1,6 +1,6 @@
 import { useState } from "react"
 import ReactDOM from "react-dom"
-import { useAuth } from "../../contexts/AuthContext/useAuth";
+import { useAuth } from "../contexts/AuthContext/useAuth";
 import toast from "react-hot-toast";
 
 const CreateGroupModal = ({onClose}: {onClose: () => void}) => {

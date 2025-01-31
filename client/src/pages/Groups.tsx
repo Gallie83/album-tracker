@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import CreateGroupModal from '../components/modals/CreateGroupModal'
+import CreateGroupModal from '../modals/CreateGroupModal'
 import { useAuth } from '../contexts/AuthContext/useAuth';
 import { useGroupContext } from '../contexts/GroupContext/useGroupContext';
-import AuthModal from '../components/modals/AuthModal';
+import AuthModal from '../modals/AuthModal';
 
 function Groups() {
 
@@ -30,9 +30,6 @@ function Groups() {
 
         <button onClick={openCreateGroupModal}>Create New Group</button>
 
-        {/* Authentication modal */}
-        {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)}/>}
-
         <h3>Your groups</h3>
 
         {usersGroups ? (
@@ -56,6 +53,9 @@ function Groups() {
         
       {/* Create New Group modal */}
       {isCreateGroupModalOpen && <CreateGroupModal onClose={() => setIsCreateGroupModalOpen(false)}/>}
+
+      {/* Authentication modal */}
+      {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)}/>}
     </>
   )
 }

@@ -2,9 +2,9 @@ import { useState } from 'react';
 import VinylImage from './vinyl-image.png';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext/useAuth';
-import FeedbackFormModal from '../modals/FeedbackFormModal';
+import FeedbackFormModal from '../../modals/FeedbackFormModal';
 import { handleLogin } from '../../utils/authUtils';
-import AuthModal from '../modals/AuthModal';
+import AuthModal from '../../modals/AuthModal';
 
 function Navbar() {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);

@@ -1,6 +1,6 @@
 import ReactDOM from "react-dom"
-import { useAuth } from "../../contexts/AuthContext/useAuth";
-import { handleLogin } from "../../utils/authUtils";
+import { useAuth } from "../contexts/AuthContext/useAuth";
+import { handleLogin } from "../utils/authUtils";
 
 const AuthModal = ({onClose}: {onClose: () => void}) => {
 

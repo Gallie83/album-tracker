@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom"
-import RatingModal from "../../components/modals/RatingModal";
-import AuthModal from "../../components/modals/AuthModal"
+import RatingModal from "../../modals/RatingModal";
+import AuthModal from "../../modals/AuthModal"
 import { useAuth } from "../../contexts/AuthContext/useAuth";
 import { useAlbumContext } from "../../contexts/AlbumContext/useAlbumContext";
 import { useGroupContext } from "../../contexts/GroupContext/useGroupContext";
@@ -277,18 +277,6 @@ function AlbumInfo() {
         // Outer div
         <div className="flex items-center justify-center h-screen">
 
-          {/* Rating modal  */}
-          {isRatingModalOpen && ( <RatingModal 
-                            data-testid="rating-modal"
-                            closeModal={closeModal}
-                            onSubmitRating={handleRating}>
-                          </RatingModal> 
-              )}
-
-          {/* Authentication modal */}
-          {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)}/>}
-
-
           <div key={album.hashId} className="flex w-11/12 items-stretch bg-pink-300 border border-gray-200 rounded-lg md:flex-row p-5">
             {/* Left Section with Image and Track List */}
             <div className="flex flex-col w-2/5 p-2 bg-slate-600">
@@ -414,11 +402,21 @@ function AlbumInfo() {
               <a data-testid="more-info" target="_blank" rel="noopener noreferrer" className="border border-black p-1 bg-stone-400" href={album.url}>More info</a>
 
             </div>
-
           </div>
 
+          
+          {/* Rating modal  */}
+          {isRatingModalOpen && ( 
+            <RatingModal 
+              data-testid="rating-modal"
+              closeModal={closeModal}
+              onSubmitRating={handleRating}>
+            </RatingModal> 
+          )}
+          
+          {/* Authentication modal */}
+          {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)}/>}
         </div>
-
       
   ) : ( <p>ERROR</p> )}
     </>

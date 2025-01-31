@@ -1,7 +1,7 @@
 import { useAuth } from "../contexts/AuthContext/useAuth";
 import { useAlbumContext } from "../contexts/AlbumContext/useAlbumContext";
 import { useState } from "react";
-import AuthModal from "../components/modals/AuthModal";
+import AuthModal from "../modals/AuthModal";
 
 function Profile() {
       // Modals
@@ -53,9 +53,6 @@ function Profile() {
       <>
         <h1>Your Profile</h1>
 
-        {/* Authentication modal */}
-        {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)}/>}
-
         {isAuthenticated ? (
             <div>
                 <h2>Welcome, {username}</h2>
@@ -99,6 +96,8 @@ function Profile() {
             </div>
         )}
 
+        {/* Authentication modal */}
+        {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)}/>}
       </>
     )
 }
