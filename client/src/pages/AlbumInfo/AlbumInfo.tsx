@@ -7,6 +7,7 @@ import { useGroupContext } from "../../contexts/GroupContext/useGroupContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookmark } from '@fortawesome/free-solid-svg-icons';
 import { handleLogin } from "../../utils/authUtils";
+import toast, { Toaster } from "react-hot-toast";
 
 const apiKey = import.meta.env.VITE_APP_API_KEY;
 
@@ -192,6 +193,7 @@ function AlbumInfo() {
       // Check if album already exists in group
       const albumExists = group.albums.some((album: {hashId: string}) => album?.hashId === hashId);
       if(albumExists) {
+        toast.error('Album already exists in this group')
         throw new Error('Album already exists in this group')
       }
 
@@ -205,6 +207,7 @@ function AlbumInfo() {
       });
 
       if(!response.ok) {
+        toast.error(`Error: ${response.status}`)
         throw new Error(`Error: ${response.status}`)
       }
 
@@ -218,6 +221,8 @@ function AlbumInfo() {
         return prevGroups.map(group => 
         group._id === groupId ? updatedGroup : group
       )});
+
+      toast.success(`Album added to ${updatedGroup.title}`)
 
     } catch (error) {
       console.error('Error adding album to group:', error)
@@ -397,9 +402,12 @@ function AlbumInfo() {
             </div>
 
           </div>
+          <Toaster
+          position="top-right"
+          reverseOrder={false}
+          />
         </div>
 
-          
       
   ) : ( <p>ERROR</p> )}
     </>
