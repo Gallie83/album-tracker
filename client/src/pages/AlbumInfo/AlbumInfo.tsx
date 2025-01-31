@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom"
 import RatingModal from "../../components/modals/RatingModal";
+import AuthModal from "../../components/modals/AuthModal"
 import { useAuth } from "../../contexts/AuthContext/useAuth";
 import { useAlbumContext } from "../../contexts/AlbumContext/useAlbumContext";
 import { useGroupContext } from "../../contexts/GroupContext/useGroupContext";
@@ -27,9 +28,11 @@ function AlbumInfo() {
   const params = useParams<{artistName:string , albumName: string, albumHashId: string}>();
   const [album, setAlbum] = useState<AlbumInfo>();
   const [open, setOpen] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
   const [isSaved, setIsSaved] = useState<boolean>(false)
   const [updatingRating, setUpdatingRating] = useState<boolean>(false)
+
+  const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const [showGroupDropdown, setShowGroupDropdown] = useState(false)
 
@@ -60,7 +63,7 @@ function AlbumInfo() {
           return;
         }
       }
-      setModalOpen(true)
+      setIsRatingModalOpen(true)
     } else {
       // Redirect to login
       const returnUrl = window.location.pathname;
@@ -247,7 +250,7 @@ function AlbumInfo() {
   }
 
   const closeModal = () => {
-    setModalOpen(false)
+    setIsRatingModalOpen(false)
     setUpdatingRating(false);
   }
 
@@ -263,8 +266,9 @@ function AlbumInfo() {
         setIsSaved(!isSaved);
     } else {
       // Redirect to login
-      const returnUrl = window.location.pathname;
-      window.location.replace(`http://localhost:5000/login?returnUrl=${returnUrl}`);
+      // const returnUrl = window.location.pathname;
+      // window.location.replace(`http://localhost:5000/login?returnUrl=${returnUrl}`);
+      setIsAuthModalOpen(true)
     }
   }
       
@@ -275,12 +279,15 @@ function AlbumInfo() {
         <div className="flex items-center justify-center h-screen">
 
           {/* Rating modal  */}
-          {modalOpen && ( <RatingModal 
+          {isRatingModalOpen && ( <RatingModal 
                             data-testid="rating-modal"
                             closeModal={closeModal}
                             onSubmitRating={handleRating}>
                           </RatingModal> 
               )}
+
+          {/* Submit feedback modal */}
+          {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)}/>}
 
 
           <div key={album.hashId} className="flex w-11/12 items-stretch bg-pink-300 border border-gray-200 rounded-lg md:flex-row p-5">

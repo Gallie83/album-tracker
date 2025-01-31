@@ -1,5 +1,6 @@
 import { useAuth } from "../contexts/AuthContext/useAuth";
 import { useAlbumContext } from "../contexts/AlbumContext/useAlbumContext";
+import toast from "react-hot-toast";
 
 function Profile() {
     const { isAuthenticated, username, email, logout} = useAuth();
@@ -20,9 +21,23 @@ function Profile() {
     const handleLogout = () => {
         if(logout) {
             // Confirmation message before logout
-            if(window.confirm('Are you sure you want to log out?')) {
-                logout();
-            }
+            toast((t) => (
+                <div className="p-4 rounded-lg border border-gray-200 min-w-[300px]">
+                  <p className="text-gray-900 text-sm font-medium mb-2">
+                    Are you sure you want to Logout?
+                  </p>
+                  <hr className="border-t border-gray-200"/>
+                  <button onClick={() => toast.dismiss(t.id)}>
+                    Dismiss
+                  </button>
+                  <button onClick={() => logout()}>
+                    Logout
+                  </button>
+                </div>
+              ), { 
+                position: 'top-center',
+                duration: Infinity
+              });
         }
     };
 
