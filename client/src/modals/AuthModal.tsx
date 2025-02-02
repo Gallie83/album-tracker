@@ -6,6 +6,12 @@ const AuthModal = ({onClose}: {onClose: () => void}) => {
 
     const {isAuthenticated, logout } = useAuth()
 
+    // Close modal before logging user out to avoid modal content changing from Logged out -> Logged in before disappearing
+    const handleLogout = () => {
+        onClose();
+        logout()
+    }
+
     return ReactDOM.createPortal(
         <div className="fixed inset-0 flex min-h-screen items-center justify-center bg-black/50 z-50">
             <div className="w-full max-w-sm">
@@ -30,7 +36,7 @@ const AuthModal = ({onClose}: {onClose: () => void}) => {
                             </button>
                             { isAuthenticated ? (
                                 <button
-                                    onClick={() => logout()}
+                                    onClick={handleLogout}
                                     className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
                                     >
                                     Logout
