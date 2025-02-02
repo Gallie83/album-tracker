@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookmark } from '@fortawesome/free-solid-svg-icons';
 import { handleLogin } from "../../utils/authUtils";
 import toast from "react-hot-toast";
+import CreateGroupModal from "../../modals/CreateGroupModal";
 
 const apiKey = import.meta.env.VITE_APP_API_KEY;
 
@@ -35,8 +36,7 @@ function AlbumInfo() {
   // Modals
   const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-
-
+  const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState<boolean>(false)
   // Contexts
   const { isAuthenticated } = useAuth();
   const { usersAlbums, setUsersAlbums, savedAlbums, setSavedAlbums} = useAlbumContext();
@@ -328,7 +328,7 @@ function AlbumInfo() {
             </div>
             
             {/* Right Section with Summary */}
-            <div className="w-3/5 bg-green-300 flex flex-col justify-between p-6 px-16 leading-normal">
+            <div className="w-3/5 text-black bg-green-300 flex flex-col justify-between p-6 px-16 leading-normal">
 
               <div>
             {/* Opens RatingModal */}
@@ -348,29 +348,37 @@ function AlbumInfo() {
                       </svg>
                     </button>
 
+                  {/* Dropdown for user to select which group to add album */}
                   { showGroupDropdown && (
                     <div className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white ring-1 shadow-lg ring-black/5 focus:outline-hidden" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1}>
                       <div className="py-1" role="none">
-                      {isAuthenticated ? (
-                        usersGroups ? (
-                          usersGroups.map((group: { _id: string; title: string }) => (
-                            <button
-                              key={group._id}
-                              onClick={() => addToGroup(group._id, album.title, album.artist, album.hashId)}
-                              className="block px-4 py-2 text-sm text-gray-700"
-                            >
-                              {group.title}
-                            </button>
-                          ))
+                        {/* Conditionally render usersGroups if user is logged in */}
+                        {isAuthenticated ? (
+                          // Check if usersGroups has content
+                          usersGroups && usersGroups.length > 0 ? (
+                            usersGroups.map((group: { _id: string; title: string }) => (
+                              <button
+                                key={group._id}
+                                onClick={() => addToGroup(group._id, album.title, album.artist, album.hashId)}
+                                className="block px-4 py-2 text-sm text-gray-700"
+                              >
+                                {group.title}
+                              </button>
+                            ))
+                          ) : (
+                            // If no usersGroups, link to open CreatGroupModal
+                            <div className="p-3 flex flex-col">
+                              <div className="p-3 mx-auto">
+                                <b>No groups yet</b>
+                              </div>
+                              <button className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-1 px-2 border border-gray-400 rounded shadow" onClick={() => setIsCreateGroupModalOpen(true)}>Create Group?</button>
+                            </div>
+                          )
                         ) : (
-                          // TODO: redirect to create group modal if no usersGroups
-                          <p className="text-black">No groups yet</p>
-                        )
-                      ) : (
-                        <div className="text-black p-3">
-                          <p><button onClick={handleLogin} className="text-blue-700">Login</button> to access group features</p>
-                          </div>
-                      )}
+                          <div className="p-3">
+                            <p><button onClick={handleLogin} className="text-blue-700">Login</button> to access group features</p>
+                            </div>
+                        )}
                       </div>
                     </div>
                   )}
@@ -416,6 +424,11 @@ function AlbumInfo() {
           
           {/* Authentication modal */}
           {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)}/>}
+
+          {/* Create New Group modal */}
+          {isCreateGroupModalOpen && <CreateGroupModal onClose={() => setIsCreateGroupModalOpen(false)}/>}
+
+            
         </div>
       
   ) : ( <p>ERROR</p> )}

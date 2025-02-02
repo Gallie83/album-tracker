@@ -32,7 +32,7 @@ function Groups() {
 
         <h3>Your groups</h3>
 
-        {usersGroups ? (
+        {usersGroups && usersGroups.length > 0 ? (
             usersGroups.map((group: { _id: string; title: string; description: string;}) => (
                 <div className='bg-white text-black flex-col'>
                   <div
@@ -46,9 +46,9 @@ function Groups() {
 
                   </div>
                 </div>
-                ))) : (
-                <p>No groups yet</p>
-                )}
+          ))) : (
+          <p>No groups yet!</p>
+          )}
 
         
       {/* Create New Group modal */}

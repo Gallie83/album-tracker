@@ -1,5 +1,5 @@
 import { useState } from "react";
-import VinylImage from '../Navbar/vinyl-image.png'
+import VinylImage from '../components/Navbar/vinyl-image.png'
 import toast from "react-hot-toast";
 
 function RatingModal( {onSubmitRating, closeModal }: { onSubmitRating: (rating: number | null) => void; closeModal: () => void } ) {

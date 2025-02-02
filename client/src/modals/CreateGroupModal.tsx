@@ -71,7 +71,7 @@ const CreateGroupModal = ({onClose}: {onClose: () => void}) => {
                             onChange={(e) => setDescription(e.target.value)}>
                         </input>
                         {/* Private/Public input */}
-                        <div className="flex gap-x-6">
+                        <div className="flex mb-3 gap-x-6">
                             <div className="flex">
                                 <input 
                                     type="radio" 
