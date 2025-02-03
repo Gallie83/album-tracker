@@ -1,13 +1,11 @@
 import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import mongoose, { models } from 'mongoose';
+import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { User } from '../models/User';
 import { Group } from '../models/Group'
-// AWS Cognito import
-import session from 'express-session';
-import { Issuer, generators, Client } from 'openid-client';
-import { Session, SessionData} from 'express-session';
+import { checkAuth } from './middleware/auth';
+import { initializeCognitoClient } from './config/cognito';
 
 import nodemailer from 'nodemailer';
 
@@ -15,7 +13,7 @@ dotenv.config();
 
 const app: Express = express();
 
-
+// Middleware
 app.use(cors({
     origin: 'http://localhost:5173', // Frontend URL
     credentials: true, // Allow cookies and credentials
@@ -24,180 +22,24 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Environment Variables
-const uri: string = process.env.MONGODB_URI || "";
-const user_pool_id: string = process.env.AMAZON_USER_POOL_ID || "";
-const client_id: string = process.env.AMAZON_CLIENT_ID || "";
-const client_secret: string = process.env.AMAZON_CLIENT_SECRET || "";
-
 const email_username = process.env.EMAIL_USERNAME
 const email_password = process.env.EMAIL_PASSWORD
+const uri = process.env.MONGODB_URI || "";
 
-
-let client: Client;
-
-// Initialize OpenID Client
-async function initializeClient() {
-    const issuer = await Issuer.discover(`https://cognito-idp.us-east-1.amazonaws.com/${user_pool_id}`);
-    console.log("Issuer:", issuer);
-    client = new issuer.Client({
-        client_id: `${client_id}`,
-        client_secret: `${client_secret}`,
-        redirect_uris: ['http://localhost:5000/callback/'],
-        response_types: ['code']
-    });
-};
-initializeClient().then(() => {console.log('Client:', client)}).catch(console.error);
-
-// Session Middleware
-app.use(session({
-    secret: 'some secret',
-    resave: false,
-    saveUninitialized: false
-}));
-
-interface CustomSession extends Session {
-    userInfo?: any;
-    nonce?: string;
-    state?: string;
-    returnUrl: string;
-}
-
-// AuthenticatedRequest includes the custom session properties
-interface AuthenticatedRequest extends Request {
-    session: Session & Partial<SessionData & CustomSession>;
-    isAuthenticated?: boolean;
-}
-
-// Middleware to check if a user is authenticated
-const checkAuth = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-): void => {
-    const typedReq = req as AuthenticatedRequest; 
-    typedReq.isAuthenticated = !!typedReq.session?.userInfo; 
-    next();
-};
-
-// Home Route
-app.get('/', checkAuth, (req: Request, res: Response) => {
-    const typedReq = req as AuthenticatedRequest; 
-    res.send({
-        isAuthenticated: typedReq.isAuthenticated,
-        userInfo: typedReq.session?.userInfo || null
-    });
-});
-
-
-// Login Route
-app.get('/login', (req, res) => {
-    const typedReq = req as AuthenticatedRequest;
-    const nonce = generators.nonce();
-    const state = generators.state();
-    
-    typedReq.session.nonce = nonce;
-    typedReq.session.state = state;
-
-    
-    // Assign return URL or default to '/profile'
-    const returnUrl = req.query.returnUrl
-    ? `http://localhost:5173${req.query.returnUrl}`
-    : 'http://localhost:5173/profile';
-    typedReq.session.returnUrl = returnUrl as string;
-    
-    const authUrl = client.authorizationUrl({
-        response_type: 'code',
-        scope: 'openid email phone profile',
-        state,
-        nonce,
-        redirect_uri: 'http://localhost:5000/callback/'
-    });
-    
-    res.redirect(authUrl);
-});
-
-// Callback Route
-app.get('/callback', async (req, res) => {
-    const typedReq = req as AuthenticatedRequest;
-    try {
-        const params = client.callbackParams(typedReq);
-
-        
-        const tokenSet = await client.callback(
-            'http://localhost:5000/callback/',
-            params,
-            {
-                nonce: typedReq.session.nonce as string,
-                state: typedReq.session.state as string,
-            }
-        );
-        
-        if (!tokenSet.access_token) {
-            throw new Error('Access token is missing');
-        }
-        
-        const userInfo = await client.userinfo(tokenSet.access_token);
-        typedReq.session.userInfo = userInfo;
-
-        console.log("TypedReq USER INFO:",typedReq.session.userInfo)
-
-        console.log("USER MODEL:", User);
-
-        // Check MongoDb if user exists, if not, create new
-        let user = await User.findOne({ cognitoId: userInfo.sub });
-
-        if(!user) {     
-            console.log("NEW USER")
-            try {
-                user = new User({
-                    cognitoId: userInfo.sub,
-                    username: userInfo.preferred_username,
-                    email: userInfo.email,
-                    usersAlbums: [],
-                    userSavedAlbums: [],
-                    groups: [] 
-                });
-                await user.save();
-            } catch ( error ) {
-                console.error('Error creating user:', error)
-            }
-        }
-        
-        // Redirect to original return URL or default to '/profile'
-        const returnUrl = typedReq.session.returnUrl || 'http://localhost:5173/profile';
-        res.redirect(returnUrl);
-        
-    } catch (err) {
-        console.error('Callback error:', err);
-        res.redirect('http://localhost:5173/profile');
-    }  
-});
-
-// Logout Route
-app.get('/logout', (req, res) => {
-    const typedReq = req as AuthenticatedRequest;
-    typedReq.session.destroy((err) => {
-        if(err) { 
-            console.error('Session destruction failed:', err); 
-            return res.status(500).send('Failed to destroy session');
-        }
-    });
-    const logoutUrl = `https://${user_pool_id.toLowerCase().replace('_', '')}.auth.us-east-1.amazoncognito.com/logout?client_id=${client_id}&logout_uri=${encodeURIComponent('http://localhost:5173/')}`;
-    res.redirect(logoutUrl);
-});
+initializeCognitoClient();
 
 // Route for getting usersAlbums + usersSavedAlbums
 app.get('/user-albums', checkAuth, async (req,res) => {
-    const typedReq = req as AuthenticatedRequest;
+    ;
     try {   
         // Ensure user is authenticated
-        if(!typedReq.session.userInfo) { 
-            console.log("TRSU:", typedReq.session.userInfo)
+        if(!req.session.userInfo) { 
+            console.log("TRSU:", req.session.userInfo)
             res.status(401).json({error: 'User not authenticated'})
             return 
         }
 
-        const cognitoId = typedReq.session.userInfo.sub;
+        const cognitoId = req.session.userInfo.sub;
         const user = await User.findOne({cognitoId});
         
         if(!user) {
@@ -213,19 +55,19 @@ app.get('/user-albums', checkAuth, async (req,res) => {
 
 // Route to add to users Save/Rated albums lists
 app.post('/save-album', checkAuth, async (req,res): Promise<void> => {
-    const typedReq = req as AuthenticatedRequest;
+    ;
 
-    const { albumId, rating, title, artist } = typedReq.body;
+    const { albumId, rating, title, artist } = req.body;
     
     try {
         // Ensure user is authenticated
-        if(!typedReq.session.userInfo) { 
+        if(!req.session.userInfo) { 
             res.status(401).json({error: 'User not authenticated'})
             return 
         }
 
         // Set cognitoId and then search for user
-        const cognitoId = typedReq.session.userInfo.sub
+        const cognitoId = req.session.userInfo.sub
 
         const user = await User.findOne({ cognitoId });
 
@@ -274,19 +116,19 @@ app.post('/save-album', checkAuth, async (req,res): Promise<void> => {
 
 // Route to remove an album from a list
 app.delete('/remove-album', checkAuth, async (req,res) => {
-    const typedReq = req as AuthenticatedRequest;
+    ;
 
-    const { albumId, rating } = typedReq.body;
+    const { albumId, rating } = req.body;
     
     try {
         // Ensure user is authenticated
-        if(!typedReq.session.userInfo) { 
+        if(!req.session.userInfo) { 
             res.status(401).json({error: 'User not authenticated'})
             return 
         }
 
         // Set cognitoId and then search for user
-        const cognitoId = typedReq.session.userInfo.sub
+        const cognitoId = req.session.userInfo.sub
 
         const user = await User.findOne({ cognitoId });
 
@@ -314,19 +156,19 @@ app.delete('/remove-album', checkAuth, async (req,res) => {
 
 // Route to update album rating
 app.put('/update-rating', checkAuth, async (req,res) => {
-    const typedReq = req as AuthenticatedRequest;
+    ;
 
-    const { albumId, rating } = typedReq.body;
+    const { albumId, rating } = req.body;
 
     try {
         // Ensure user is authenticated
-        if(!typedReq.session.userInfo) { 
+        if(!req.session.userInfo) { 
             res.status(401).json({error: 'User not authenticated'})
             return 
         }
         
         // Set cognitoId and then search for user
-        const cognitoId = typedReq.session.userInfo.sub
+        const cognitoId = req.session.userInfo.sub
 
         const user = await User.findOne({ cognitoId });
 
@@ -354,9 +196,9 @@ app.put('/update-rating', checkAuth, async (req,res) => {
 
 // Route to create a new listening group
 app.post('/create-group', async(req,res) => {
-    const typedReq = req as AuthenticatedRequest;
+    ;
 
-    const { groupName, description, isPrivate, cognitoId } = typedReq.body;
+    const { groupName, description, isPrivate, cognitoId } = req.body;
 
     try {
         // Create Group with users cognitoId as first member Id
@@ -434,9 +276,9 @@ app.post('/groups/add-album/:groupId', async(req,res) => {
 
 // Send email with feedback from users
 app.post("/submit-feedback", async (req,res) => {
-    const typedReq = req as AuthenticatedRequest;
+    ;
 
-    const { feedback, email } = typedReq.body;
+    const { feedback, email } = req.body;
 
     try { 
         // Configure the transporter
