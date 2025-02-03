@@ -1,7 +1,8 @@
-import express, { Express, Request, Response, NextFunction } from 'express';
+import express, { Express } from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import session from 'express-session';
 import { User } from '../models/User';
 import { Group } from '../models/Group'
 import { checkAuth } from './middleware/auth';

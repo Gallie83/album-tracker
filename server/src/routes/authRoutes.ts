@@ -79,11 +79,18 @@ router.get('/callback', async (req, res) => {
         }
         
         const userInfo = await client.userinfo(tokenSet.access_token);
-        req.session.userInfo = userInfo;
+
+        // Ensure required field - sub, is present
+        if (!userInfo.sub) {
+            throw new Error('User info is missing required field: sub');
+        }
+        req.session.userInfo = {
+            sub: userInfo.sub,
+            email: userInfo.email, // Optional
+            preferred_username: userInfo.preferred_username, // Optional
+          };
 
         console.log("TypedReq USER INFO:",req.session.userInfo)
-
-        console.log("USER MODEL:", User);
 
         // Check MongoDb if user exists, if not, create new
         let user = await User.findOne({ cognitoId: userInfo.sub });
