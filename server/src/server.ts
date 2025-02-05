@@ -1,8 +1,8 @@
 import express, { Express } from 'express';
+import session from 'express-session'
 import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import session from 'express-session';
 import { User } from '../models/User';
 import { Group } from '../models/Group'
 import { checkAuth } from './middleware/auth';
@@ -22,16 +22,21 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use(session({
+    secret: 'some secret',
+    resave: false,
+    saveUninitialized: false,
+}));
+
+initializeCognitoClient();
+
 // Environment Variables
 const email_username = process.env.EMAIL_USERNAME
 const email_password = process.env.EMAIL_PASSWORD
 const uri = process.env.MONGODB_URI || "";
 
-initializeCognitoClient();
-
 // Route for getting usersAlbums + usersSavedAlbums
 app.get('/user-albums', checkAuth, async (req,res) => {
-    ;
     try {   
         // Ensure user is authenticated
         if(!req.session.userInfo) { 
@@ -56,8 +61,6 @@ app.get('/user-albums', checkAuth, async (req,res) => {
 
 // Route to add to users Save/Rated albums lists
 app.post('/save-album', checkAuth, async (req,res): Promise<void> => {
-    ;
-
     const { albumId, rating, title, artist } = req.body;
     
     try {
@@ -117,8 +120,6 @@ app.post('/save-album', checkAuth, async (req,res): Promise<void> => {
 
 // Route to remove an album from a list
 app.delete('/remove-album', checkAuth, async (req,res) => {
-    ;
-
     const { albumId, rating } = req.body;
     
     try {
@@ -157,8 +158,6 @@ app.delete('/remove-album', checkAuth, async (req,res) => {
 
 // Route to update album rating
 app.put('/update-rating', checkAuth, async (req,res) => {
-    ;
-
     const { albumId, rating } = req.body;
 
     try {
@@ -197,8 +196,6 @@ app.put('/update-rating', checkAuth, async (req,res) => {
 
 // Route to create a new listening group
 app.post('/create-group', async(req,res) => {
-    ;
-
     const { groupName, description, isPrivate, cognitoId } = req.body;
 
     try {
@@ -277,8 +274,6 @@ app.post('/groups/add-album/:groupId', async(req,res) => {
 
 // Send email with feedback from users
 app.post("/submit-feedback", async (req,res) => {
-    ;
-
     const { feedback, email } = req.body;
 
     try { 
